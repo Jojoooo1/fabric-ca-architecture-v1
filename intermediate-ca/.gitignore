@@ -1,0 +1,7 @@
+crypto-config/*
+ca-config/*
+
+# exception to the rule
+!ca-config/fabric-ca-server-config.yaml
+# exception to the rule
+!crypto-config/.gitkeep
