@@ -64,7 +64,7 @@ CreateRootCAPrivateKeyAndCSR() {
     openssl req -config openssl_root.cnf -new -x509 -sha256 -extensions v3_ca \
       -key rca-$ORG_NAME/private/rca.$ORG_FULL_NAME.key.pem \
       -out rca-$ORG_NAME/certs/rca.$ORG_FULL_NAME.crt.pem -days 3650 \
-      -subj "/C=SG/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=rca.$ORG_FULL_NAME"
+      -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=rca.$ORG_FULL_NAME"
 
     # Replace by default value
     sed -i "s/$CA_DIR/DIR_NAME/g" openssl_root.cnf
@@ -91,7 +91,7 @@ createIntermediateCAPrivateKeyAndCSR() {
     openssl req -new -sha256 \
       -key $ORG_DIR/ca/ica.$ORG_FULL_NAME.key.pem \
       -out $ORG_DIR/ca/ica.$ORG_FULL_NAME.csr \
-      -subj "/C=SG/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=ica.$ORG_FULL_NAME"
+      -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=ica.$ORG_FULL_NAME"
 
     # ROOT_CA signs INTERMEDIATE_CA's Certificate Signing Request
     openssl ca -batch -config openssl_root.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
@@ -121,7 +121,3 @@ createRootCAStructure
 CreateRootCAPrivateKeyAndCSR
 createIntermediateCAPrivateKeyAndCSR
 CreateChainFile
-
-cd $INTERMEDIATE_FABRIC_CA_DIR
-docker-compose -f docker-compose.yaml up -d
-cd $ROOT_CA_DIR
