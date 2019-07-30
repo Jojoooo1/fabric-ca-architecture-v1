@@ -5,7 +5,6 @@ export FABRIC_CFG_PATH=${PWD}
 
 DOMAIN=logistic
 ORGANIZATION_NAME=(org1)
-ORGANIZATION_PEER_NUMBER=(2)
 
 ROOT_CA_DIR=$PWD
 INTERMEDIATE_FABRIC_CA_DIR=$PWD/../intermediate-ca
@@ -15,27 +14,18 @@ CreateFabricFolderStructure() {
 
     # Orgs directory
     ORG_DIR=$INTERMEDIATE_FABRIC_CA_DIR/crypto-config/peerOrganizations/${ORGANIZATION_NAME[$i]}.$DOMAIN
-
     # Peer directory
-    for j in 1 ${ORGANIZATION_PEER_NUMBER[$i]}; do
-      PEER_DIR=$ORG_DIR/peers/peer$(($j - 1)).${ORGANIZATION_NAME[$i]}.$DOMAIN
-      # Creates MSP & admincerts folder
-      mkdir -p $PEER_DIR/msp/admincerts # Other directory will be created by fabric-ca-client
-    done
+    PEER_DIR=$ORG_DIR/peers/peer0.${ORGANIZATION_NAME[$i]}.$DOMAIN
 
-    # ca-admin & orgs admin directories
-    REGISTRAR_DIR=$ORG_DIR/users/ca-admin
+    # User directory
+    REGISTRAR_DIR=$ORG_DIR/users/admin
+    # Create admin
     ADMIN_DIR=$ORG_DIR/users/Admin@${ORGANIZATION_NAME[$i]}.$DOMAIN
 
-    # Creates user directories
-    mkdir -p $REGISTRAR_DIR $ADMIN_DIR
-
-    # Creates MSP directories
-    mkdir -p $ADMIN_DIR/msp/admincerts # Other directory will be created by fabric-ca-client
-    mkdir -p $ORG_DIR/ca $ORG_DIR/msp/admincerts $ORG_DIR/msp/intermediatecerts $ORG_DIR/msp/cacerts
+    # Creates directories
+    mkdir -p $ORG_DIR/ca $ORG_DIR/msp $PEER_DIR $REGISTRAR_DIR $ADMIN_DIR
 
   done
-
 }
 
 createRootCAStructure() {
