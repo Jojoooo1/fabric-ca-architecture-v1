@@ -1,0 +1,217 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+Organizations:
+  - &OrdererOrg
+    Name: Intelipost
+    ID: IntelipostMSP
+    MSPDir: crypto-config/ordererOrganizations/logistic/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('IntelipostMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('IntelipostMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('IntelipostMSP.admin')"
+
+  - &Org1
+    Name: Shipper
+    ID: ShipperMSP
+    MSPDir: crypto-config/peerOrganizations/shipper.logistic/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('ShipperMSP.admin', 'ShipperMSP.peer', 'ShipperMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('ShipperMSP.admin', 'ShipperMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('ShipperMSP.admin')"
+    AnchorPeers:
+      - Host: peer0.shipper.logistic
+        Port: 7051
+
+  - &Org2
+    Name: Transporter
+    ID: TransporterMSP
+    MSPDir: crypto-config/peerOrganizations/transporter.logistic/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('TransporterMSP.admin', 'TransporterMSP.peer', 'TransporterMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('TransporterMSP.admin', 'TransporterMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('TransporterMSP.admin')"
+
+    AnchorPeers:
+      - Host: peer0.transporter.logistic
+        Port: 7051
+
+  - &Org3
+    Name: Insurance
+    ID: InsuranceMSP
+    MSPDir: crypto-config/peerOrganizations/insurance.logistic/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('InsuranceMSP.admin', 'InsuranceMSP.peer', 'InsuranceMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('InsuranceMSP.admin', 'InsuranceMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('InsuranceMSP.admin')"
+
+    AnchorPeers:
+      - Host: peer0.insurance.logistic
+        Port: 7051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V1_3: true
+  Orderer: &OrdererCapabilities
+    V1_1: false
+  Application: &ApplicationCapabilities
+    V1_3: true
+    V1_2: false
+    V1_1: false
+
+# /Channel/Application/<PolicyName>
+Application: &ApplicationDefaults # Sets in profile
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: 'ANY Readers'
+    Writers:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+    Admins:
+      Type: ImplicitMeta
+      Rule: 'MAJORITY Admins'
+
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+# /Channel/Orderer/<PolicyName>
+Orderer: &OrdererDefaults # Overrided by profile
+  OrdererType: solo
+  # Overrided by profile
+  Addresses:
+    - intelipost.logistic:7050
+  # Batch Timeout: The amount of time to wait before creating a batch
+  BatchTimeout: 2s
+  # Batch Size: Controls the number of messages batched into a block
+  BatchSize:
+    # Max Message Count: The maximum number of messages to permit in a batch
+    MaxMessageCount: 10
+    # Absolute Max Bytes: The absolute maximum number of bytes allowed for
+    # the serialized messages in a batch.
+    AbsoluteMaxBytes: 99 MB
+    # Preferred Max Bytes: The preferred maximum number of bytes allowed for
+    # the serialized messages in a batch. A message larger than the preferred
+    # max bytes will result in a batch larger than preferred max bytes.
+    PreferredMaxBytes: 512 KB
+
+  # Sets in profile
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: 'ANY Readers'
+    Writers:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+    Admins:
+      Type: ImplicitMeta
+      Rule: 'MAJORITY Admins'
+    # BlockValidation specifies what signatures must be included in the block
+    # from the orderer for the peer to validate it.
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+
+  # /Channel/<PolicyName>
+Channel: &ChannelDefaults
+  Policies:
+    # Who may invoke the 'Deliver' API
+    Readers:
+      Type: ImplicitMeta
+      Rule: 'ANY Readers'
+    # Who may invoke the 'Broadcast' API
+    Writers:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+    # By default, who may modify elements at this config level
+    Admins:
+      Type: ImplicitMeta
+      Rule: 'MAJORITY Admins'
+  Capabilities:
+    <<: *ChannelCapabilities
+
+# Profile: Different configuration profiles may be encoded here to be specified as
+# parameters to the configtxgen tool
+Profiles:
+  OrgsOrdererGenesis:
+    <<: *ChannelDefaults
+    Capabilities:
+      <<: *ChannelCapabilities
+    # Override default config
+    Orderer:
+      <<: *OrdererDefaults
+      OrdererType: etcdraft
+      EtcdRaft:
+        Consenters:
+          - Host: intelipost.logistic
+            Port: 7050
+            ClientTLSCert: crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/tls/server.crt
+            ServerTLSCert: crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/tls/server.crt
+          - Host: intelipost2.logistic
+            Port: 7050
+            ClientTLSCert: crypto-config/ordererOrganizations/logistic/orderers/intelipost2.logistic/tls/server.crt
+            ServerTLSCert: crypto-config/ordererOrganizations/logistic/orderers/intelipost2.logistic/tls/server.crt
+          - Host: intelipost3.logistic
+            Port: 7050
+            ClientTLSCert: crypto-config/ordererOrganizations/logistic/orderers/intelipost3.logistic/tls/server.crt
+            ServerTLSCert: crypto-config/ordererOrganizations/logistic/orderers/intelipost3.logistic/tls/server.crt
+      Addresses:
+        - intelipost.logistic:7050
+        - intelipost2.logistic:7050
+        - intelipost3.logistic:7050
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - <<: *OrdererOrg
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+          - *Org1
+          - *Org2
+          - *Org3
+
+  OrgsChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org1
+        - *Org2
+        - *Org3
+      Capabilities:
+        <<: *ApplicationCapabilities
