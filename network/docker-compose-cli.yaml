@@ -1,0 +1,196 @@
+version: '2'
+
+networks:
+  basic:
+
+volumes:
+  peer0.shipper.logistic:
+  peer1.shipper.logistic:
+
+  # peer0.transporter.logistic:
+  # peer1.transporter.logistic:
+
+  # peer0.insurance.logistic:
+  # peer1.insurance.logistic:
+
+services:
+  # SHIPPER
+  # PEER 0
+  couchdb.peer0.shipper:
+    container_name: couchdb.peer0.shipper
+    image: hyperledger/fabric-couchdb:$IMAGE_TAG
+    restart: always
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # volume
+      # "/opt/couchdb/data": {}, vol 3
+      # "/opt/couchdb/etc/local.d": {} vol 1
+    ports:
+      - 5984:5984 # http://localhost:5984/_utils/#/_all_dbs
+    networks:
+      - basic
+  peer0.shipper.logistic:
+    container_name: peer0.shipper.logistic
+    extends:
+      file: base/docker-compose-base.yaml
+      service: peer0.shipper.logistic
+    depends_on:
+      - couchdb.peer0.shipper
+    networks:
+      - basic
+  # PEER 1
+  couchdb.peer1.shipper:
+    container_name: couchdb.peer1.shipper
+    image: hyperledger/fabric-couchdb:$IMAGE_TAG
+    restart: always
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 6984:5984
+    networks:
+      - basic
+  peer1.shipper.logistic:
+    container_name: peer1.shipper.logistic
+    extends:
+      file: base/docker-compose-base.yaml
+      service: peer1.shipper.logistic
+    depends_on:
+      - couchdb.peer1.shipper
+    networks:
+      - basic
+
+  # TRANSPORTER
+  # PEER 0
+  # couchdb.peer0.transporter:
+  #   container_name: couchdb.peer0.transporter
+  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
+  #   restart: always
+  #   environment:
+  #     - COUCHDB_USER=
+  #     - COUCHDB_PASSWORD=
+  #   ports:
+  #     - 7984:5984
+  #   networks:
+  #     - basic
+  # peer0.transporter.logistic:
+  #   container_name: peer0.transporter.logistic
+  #   extends:
+  #     file: base/docker-compose-base.yaml
+  #     service: peer0.transporter.logistic
+  #   depends_on:
+  #     - couchdb.peer0.transporter
+  #   networks:
+  #     - basic
+  # PEER 1
+  # couchdb.peer1.transporter:
+  #   container_name: couchdb.peer1.transporter
+  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
+  #   restart: always
+  #   environment:
+  #     - COUCHDB_USER=
+  #     - COUCHDB_PASSWORD=
+  #   ports:
+  #     - 8984:5984
+  #   networks:
+  #     - basic
+  # peer1.transporter.logistic:
+  #   container_name: peer1.transporter.logistic
+  #   extends:
+  #     file: base/docker-compose-base.yaml
+  #     service: peer1.transporter.logistic
+  #   depends_on:
+  #     - couchdb.peer1.transporter
+  #   networks:
+  #     - basic
+
+  # INSURANCE
+  # PEER 0
+  # couchdb.peer0.insurance:
+  #   container_name: couchdb.peer0.insurance
+  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
+  #   restart: always
+  #   environment:
+  #     - COUCHDB_USER=
+  #     - COUCHDB_PASSWORD=
+  #   ports:
+  #     - 9984:5984
+  #   networks:
+  #     - basic
+  # peer0.insurance.logistic:
+  #   container_name: peer0.insurance.logistic
+  #   extends:
+  #     file: base/docker-compose-base.yaml
+  #     service: peer0.insurance.logistic
+  #   depends_on:
+  #     - couchdb.peer0.insurance
+  #   networks:
+  #     - basic
+  # PEER 1
+  # couchdb.peer1.insurance:
+  #   container_name: couchdb.peer1.insurance
+  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
+  #   restart: always
+  #   environment:
+  #     - COUCHDB_USER=
+  #     - COUCHDB_PASSWORD=
+  #   ports:
+  #     - 1084:5984
+  #   networks:
+  #     - basic
+  # peer1.insurance.logistic:
+  #   container_name: peer1.insurance.logistic
+  #   extends:
+  #     file: base/docker-compose-base.yaml
+  #     service: peer1.insurance.logistic
+  #   depends_on:
+  #     - couchdb.peer1.transporter
+  #   networks:
+  #     - basic
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=info
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.shipper.logistic:7051
+      - CORE_PEER_LOCALMSPID=ShipperMSP
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/users/Admin@shipper.logistic/msp
+      - CORE_CHAINCODE_KEEPALIVE=10
+      # enable TLS
+      - CORE_PEER_TLS_ENABLED=$CORE_PEER_TLS_ENABLED
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/server.key
+      # TLSCA
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/ca.crt
+
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./${CHAINCODE_PATH}/:/opt/gopath/src/github.com/chaincode
+      - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+      # - "/etc/hyperledger/fabric": {} vol 2
+    depends_on:
+      - couchdb.peer0.shipper
+      - couchdb.peer1.shipper
+      - peer0.shipper.logistic
+      - peer1.shipper.logistic
+
+      # - couchdb.peer0.transporter
+      # - couchdb.peer1.transporter
+      # - peer0.transporter.logistic
+      # - peer1.transporter.logistic
+
+      # - couchdb.peer0.insurance
+      # - couchdb.peer1.insurance
+      # - peer0.insurance.logistic
+      # - peer1.insurance.logistic
+    networks:
+      - basic

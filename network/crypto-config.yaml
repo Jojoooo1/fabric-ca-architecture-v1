@@ -1,0 +1,66 @@
+# Organization/msp will be registered in block with:  admin cert / ca root cert / tlsca root cert
+
+OrdererOrgs:
+  - Name: Intelipost
+    Domain: logistic
+    Specs:
+      - Hostname: intelipost
+      - Hostname: intelipost2
+      - Hostname: intelipost3
+    CA:
+      Hostname: ca # implicitly ca.intelipost.logistic
+      Country: Brasil
+      Province: São Paulo
+      Locality: São Paulo
+      # OrganizationalUnit: intelipost
+      # StreetAddress: address for org # default nil
+      # PostalCode: postalCode for org # default nil
+
+PeerOrgs:
+  # - Name: Shipper
+  #   Domain: shipper.logistic
+  #   EnableNodeOUs: true # Set "Organization Unit: client" (Admin Cert) & "Organization Unit: peer" (Peer Cert)
+  #   CA:
+  #     Hostname: ca # implicitly ca.shipper.logistic
+  #     # OrganizationalUnit: "test" # Set Organization Unit in cert & overwrite client/peer
+  #     Country: Brasil
+  #     Province: São Paulo
+  #     Locality: São Paulo
+  #     # StreetAddress: address for org # default nil
+  #     # PostalCode: postalCode for org # default nil
+  #   Template:
+  #     Count: 2 # Number of Peer
+  #   Users:
+  #     Count: 0 # by default create Admin@shipper.logistic then number of User to create UserX@shipper.logistic
+
+  - Name: Transporter
+    Domain: transporter.logistic
+    EnableNodeOUs: true
+    CA:
+      Hostname: ca # implicitly ca.shipper.logistic
+      # OrganizationalUnit: "test" # Set Organization Unit in cert & overwrite client/peer
+      Country: Brasil
+      Province: São Paulo
+      Locality: São Paulo
+      # StreetAddress: address for org # default nil
+      # PostalCode: postalCode for org # default nil
+    Template:
+      Count: 2 # Number of Peer
+    Users:
+      Count: 0
+
+  - Name: Insurance
+    Domain: insurance.logistic
+    EnableNodeOUs: true
+    CA:
+      Hostname: ca # implicitly ca.shipper.logistic
+      # OrganizationalUnit: "test" # Set Organization Unit in cert & overwrite client/peer
+      Country: Brasil
+      Province: São Paulo
+      Locality: São Paulo
+      # StreetAddress: address for org # default nil
+      # PostalCode: postalCode for org # default nil
+    Template:
+      Count: 2 # Number of Peer
+    Users:
+      Count: 0

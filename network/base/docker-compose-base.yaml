@@ -1,0 +1,183 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+  peer0.shipper.logistic:
+    container_name: peer0.shipper.logistic
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      # PEER
+      - CORE_PEER_ID=peer0.shipper.logistic
+      - CORE_PEER_ADDRESS=peer0.shipper.logistic:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      # PEER_CHAINCODE
+      - CORE_PEER_CHAINCODEADDRESS=peer0.shipper.logistic:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # CONFIG
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.shipper.logistic:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.shipper.logistic:8051
+      - CORE_PEER_LOCALMSPID=ShipperMSP
+      # COUCH_DB
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer0.shipper:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls:/etc/hyperledger/fabric/tls
+      - peer0.shipper.logistic:/var/hyperledger/production # i. chaincodes/ ii. ledgerData/ iii. transientStore => These three folders are required to recreate the peer.
+    ports:
+      - 7051:7051 # sets in configtx
+      # 7052:7052 chaincode
+
+  peer1.shipper.logistic:
+    container_name: peer1.shipper.logistic
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.shipper.logistic
+      - CORE_PEER_ADDRESS=peer1.shipper.logistic:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+
+      - CORE_PEER_CHAINCODEADDRESS=peer1.shipper.logistic:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.shipper.logistic:8051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.shipper.logistic:7051
+      - CORE_PEER_LOCALMSPID=ShipperMSP
+
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer1.shipper:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/shipper.logistic/peers/peer1.shipper.logistic/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/shipper.logistic/peers/peer1.shipper.logistic/tls:/etc/hyperledger/fabric/tls
+      - peer1.shipper.logistic:/var/hyperledger/production
+    ports:
+      - 8051:8051
+
+  peer0.transporter.logistic:
+    container_name: peer0.transporter.logistic
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.transporter.logistic
+      - CORE_PEER_ADDRESS=peer0.transporter.logistic:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+
+      - CORE_PEER_CHAINCODEADDRESS=peer0.transporter.logistic:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.transporter.logistic:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.transporter.logistic:10051
+      - CORE_PEER_LOCALMSPID=TransporterMSP
+
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer0.transporter:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/transporter.logistic/peers/peer0.transporter.logistic/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/transporter.logistic/peers/peer0.transporter.logistic/tls:/etc/hyperledger/fabric/tls
+      - peer0.transporter.logistic:/var/hyperledger/production
+    ports:
+      - 9051:9051
+
+  peer1.transporter.logistic:
+    container_name: peer1.transporter.logistic
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.transporter.logistic
+      - CORE_PEER_ADDRESS=peer1.transporter.logistic:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+
+      - CORE_PEER_CHAINCODEADDRESS=peer1.transporter.logistic:10052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.transporter.logistic:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.transporter.logistic:9051
+      - CORE_PEER_LOCALMSPID=TransporterMSP
+
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer1.transporter:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/transporter.logistic/peers/peer1.transporter.logistic/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/transporter.logistic/peers/peer1.transporter.logistic/tls:/etc/hyperledger/fabric/tls
+      - peer1.transporter.logistic:/var/hyperledger/production
+    ports:
+      - 10051:10051
+
+  peer0.insurance.logistic:
+    container_name: peer0.insurance.logistic
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.insurance.logistic
+      - CORE_PEER_ADDRESS=peer0.insurance.logistic:11051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
+
+      - CORE_PEER_CHAINCODEADDRESS=peer0.insurance.logistic:11052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
+
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.insurance.logistic:11051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.insurance.logistic:12051
+      - CORE_PEER_LOCALMSPID=InsuranceMSP
+
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer0.insurance:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/insurance.logistic/peers/peer0.insurance.logistic/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/insurance.logistic/peers/peer0.insurance.logistic/tls:/etc/hyperledger/fabric/tls
+      - peer0.insurance.logistic:/var/hyperledger/production
+    ports:
+      - 11051:11051
+
+  peer1.insurance.logistic:
+    container_name: peer1.insurance.logistic
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.insurance.logistic
+      - CORE_PEER_ADDRESS=peer1.insurance.logistic:12051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:12051
+
+      - CORE_PEER_CHAINCODEADDRESS=peer1.insurance.logistic:12052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:12052
+
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.insurance.logistic:12051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.insurance.logistic:11051
+      - CORE_PEER_LOCALMSPID=InsuranceMSP
+
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer1.insurance:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/insurance.logistic/peers/peer1.insurance.logistic/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/insurance.logistic/peers/peer1.insurance.logistic/tls:/etc/hyperledger/fabric/tls
+      - peer1.insurance.logistic:/var/hyperledger/production
+    ports:
+      - 12051:12051
