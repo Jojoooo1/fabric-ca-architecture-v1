@@ -86,5 +86,8 @@ function generateChannelArtifacts() {
 
 }
 
-generateCert
-generateChannelArtifacts
+# generateCert
+# generateChannelArtifacts
+cryptogen generate --config=./$CRYPTO_CONFIG
+configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block -channelID testchainid
+configtxgen -profile Channel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID mychannel

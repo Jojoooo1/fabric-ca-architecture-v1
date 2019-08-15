@@ -29,10 +29,10 @@ ORGANIZATION_MSPID=(${ORGANIZATION_NAME[0]}MSP)
 ORGANIZATION_DOMAIN=(${ORGANIZATION_NAME[0],,}.${DOMAIN}) # ORGANIZATION_NAME in minuscula
 # ORGANIZATION_DOMAIN=(${ORGANIZATION_NAME[0],,}.${DOMAIN} ${ORGANIZATION_NAME[1],,}.${DOMAIN} ${ORGANIZATION_NAME[2],,}.${DOMAIN}) # ORGANIZATION_NAME in minuscula
 
-ORGANIZATION_PEER_NUMBER=(2)           # Template count in crypto-config && modify docker-compose
+ORGANIZATION_PEER_NUMBER=(1)           # Template count in crypto-config && modify docker-compose
 ORGANIZATION_PEER_STARTING_PORT=(7051) # PORT START NUMBER
 
-ORDERER_TYPE="raft"
+# ORDERER_TYPE="raft"
 ORDERER_NAME=Intelipost
 ORDERER_DOMAIN=${ORDERER_NAME,,}.${DOMAIN} #ORDERER_NAME in minuscula
 ORDERER_CA_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/${DOMAIN}/orderers/${ORDERER_DOMAIN}/msp/tlscacerts/tlsca.${DOMAIN}-cert.pem"

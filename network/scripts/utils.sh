@@ -5,7 +5,7 @@ setVariables() {
   ORGANIZATION_INDEX=$1
   PEER_NUMBER=$2
   # PEER_NUMBER ($2) start at 1 (because of loop value) but PEER_NAME at 0 => do a subtraction
-  if [ -z "$PEER_NUMBER" -o "$PEER_NUMBER" = 0 ]; then PEER_NUMBER=0; else PEER_NUMBER=$(($2 - 1)); fi
+  if [ -z "$PEER_NUMBER" ]; then PEER_NUMBER=0; fi
 
   PEER_PORT_INDEX=${ORGANIZATION_PEER_STARTING_PORT[$ORGANIZATION_INDEX]} # Gets starting port
   PEER_PORT=$(($PEER_PORT_INDEX + $PEER_NUMBER * 1000))                   # Calc starting port + peer number
@@ -56,8 +56,7 @@ createChannel() {
 
 joinPeersTochannel() {
   for i in ${!ORGANIZATION_DOMAIN[@]}; do # Loop every organization
-
-    for j in 1 ${ORGANIZATION_PEER_NUMBER[$i]}; do # loop every peer
+    for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
       setVariables $i $j
       docker exec -it \
         -e "CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH" \
@@ -96,7 +95,7 @@ installChaincodeToPeers() {
   for k in ${!CHAINCODE_NAME[@]}; do # Loop every chaincode
     for i in ${!ORGANIZATION_DOMAIN[@]}; do # Loop every organization
 
-      for j in 1 ${ORGANIZATION_PEER_NUMBER[$i]}; do # loop every peer
+      for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
         setVariables $i $j
         docker exec -it \
           -e "CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH" \
@@ -165,7 +164,7 @@ startChaincodeContainer() {
 
       ORGANIZATION_START_INDEX=$(($i + 1))
 
-      for j in 1 ${PEER_NUMBER[$i]}; do # Loop every peer
+      for ((j = 0; j < ${PEER_NUMBER[$i]}; j++)); do # loop every peer
         setVariables $ORGANIZATION_START_INDEX $j
         docker exec -it \
           -e "CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH" \

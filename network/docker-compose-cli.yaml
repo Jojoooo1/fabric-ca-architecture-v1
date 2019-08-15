@@ -5,7 +5,7 @@ networks:
 
 volumes:
   peer0.shipper.logistic:
-  peer1.shipper.logistic:
+  # peer1.shipper.logistic:
 
   # peer0.transporter.logistic:
   # peer1.transporter.logistic:
@@ -30,6 +30,7 @@ services:
       - 5984:5984 # http://localhost:5984/_utils/#/_all_dbs
     networks:
       - basic
+
   peer0.shipper.logistic:
     container_name: peer0.shipper.logistic
     extends:
@@ -39,27 +40,28 @@ services:
       - couchdb.peer0.shipper
     networks:
       - basic
+      
   # PEER 1
-  couchdb.peer1.shipper:
-    container_name: couchdb.peer1.shipper
-    image: hyperledger/fabric-couchdb:$IMAGE_TAG
-    restart: always
-    environment:
-      - COUCHDB_USER=
-      - COUCHDB_PASSWORD=
-    ports:
-      - 6984:5984
-    networks:
-      - basic
-  peer1.shipper.logistic:
-    container_name: peer1.shipper.logistic
-    extends:
-      file: base/docker-compose-base.yaml
-      service: peer1.shipper.logistic
-    depends_on:
-      - couchdb.peer1.shipper
-    networks:
-      - basic
+  # couchdb.peer1.shipper:
+  #   container_name: couchdb.peer1.shipper
+  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
+  #   restart: always
+  #   environment:
+  #     - COUCHDB_USER=
+  #     - COUCHDB_PASSWORD=
+  #   ports:
+  #     - 6984:5984
+  #   networks:
+  #     - basic
+  # peer1.shipper.logistic:
+    # container_name: peer1.shipper.logistic
+    # extends:
+    #   file: base/docker-compose-base.yaml
+    #   service: peer1.shipper.logistic
+    # depends_on:
+    #   - couchdb.peer1.shipper
+    # networks:
+      # - basic
 
   # TRANSPORTER
   # PEER 0
@@ -179,9 +181,9 @@ services:
       # - "/etc/hyperledger/fabric": {} vol 2
     depends_on:
       - couchdb.peer0.shipper
-      - couchdb.peer1.shipper
+      # - couchdb.peer1.shipper
       - peer0.shipper.logistic
-      - peer1.shipper.logistic
+      # - peer1.shipper.logistic
 
       # - couchdb.peer0.transporter
       # - couchdb.peer1.transporter
