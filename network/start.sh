@@ -8,7 +8,7 @@ set -ev
 DIR=$PWD
 
 # Loads CA private key
-loadCAPrivateKey
+# loadCAPrivateKey
 
 # Mounts containers
 docker-compose -f $COMPOSE_FILE_CLI -f $COMPOSE_FILE_RAFT up -d

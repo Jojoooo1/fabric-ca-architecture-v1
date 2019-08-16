@@ -1,17 +1,16 @@
 #!/bin/bash
+set -e
 
 dir=$PWD
 
-cd ./root-ca
-./reset.sh && ./build.sh
+$dir/reset.sh
+
+cd $dir/root-ca/certificate && ./build.sh
+cd $dir/root-ca/tls && ./build.sh
 
 sleep 4
 
-cd ../network
+cd ../../network
 ./start-crypto.sh
-
-./build.sh
-
-./start.sh
 
 cd $dir

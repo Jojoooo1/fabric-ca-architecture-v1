@@ -19,7 +19,7 @@ if [ ! -d $ORG_DIR ] || [ ! -d $REGISTRAR_DIR ] || [ ! -d $ADMIN_DIR ] || [ ! -d
   exit 1
 fi
 
-docker-compose -f docker-compose-ca.yaml up -d
+docker-compose -f docker-compose-ca.yaml up -d ica.shipper.logistic 
 
 sleep 10
 

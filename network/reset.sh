@@ -17,6 +17,7 @@ if [ ! -z "$CLEAN_ALL" ]; then
   # Resets ca-config
   sudo rm -rf $DIR/ca-config/*
   # Copy default config with backdate argument
+  #  cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
   cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
   # if set specific ca-server-config
   # cd $DIR/ca-server-config

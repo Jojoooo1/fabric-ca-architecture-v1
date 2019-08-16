@@ -2,12 +2,13 @@
 set -e
 
 ROOT_CA_DIR=$PWD
-FABRIC_CA_DIR=$PWD/../network # Fabric CA is created as intermediate CA
+FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
 
 # Remove ROOT_CA_CONFIG
-rm -rf rca-*
+rm -rf tls-rca-*
+rm -rf tls-ica-*
 
-# Remove INTERMEDIATE_CA_CONFIG
+# Remove FABRIC_CA_CONFIG
 if [ -d $FABRIC_CA_DIR ]; then
   cd $FABRIC_CA_DIR
   ./reset.sh "CLEAN_ALL"

@@ -38,7 +38,6 @@ replaceCAPrivateKey() {
 loadCAPrivateKey() {
   for i in ${!ORGANIZATION_DOMAIN[@]}; do # @ get all value of the array ${} exec the value ! represent the index
     export CA${i}_PRIVATE_KEY=$(ls crypto-config/peerOrganizations/${ORGANIZATION_DOMAIN[$i]}/ca/*_sk | xargs -n1 basename)
-    echo $CA${i}_PRIVATE_KEY
   done
 }
 
