@@ -5,8 +5,8 @@ ROOT_CA_DIR=$PWD
 FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
 
 # Remove ROOT_CA_CONFIG
-rm -rf tls-rca-*
-rm -rf tls-ica-*
+rm -rf rca*
+rm -rf ica/*
 
 # Remove FABRIC_CA_CONFIG
 if [ -d $FABRIC_CA_DIR ]; then
