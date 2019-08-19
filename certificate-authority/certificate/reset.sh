@@ -15,9 +15,8 @@ cd $FABRIC_CA_DIR
 
 for i in ${!ORGANIZATION_NAME[@]}; do
   ORG_NAME=${ORGANIZATION_NAME[$i]}
-  echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
-
   ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
+
   rm -rf $ORG_FABRIC_DIR/ca/*
 
   cd $ROOT_CA_DIR

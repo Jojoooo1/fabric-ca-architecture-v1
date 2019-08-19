@@ -59,6 +59,7 @@ createRootCAPrivateKeyAndCSR() {
       -key $ORG_RCA_DIR/private/tls-rca.$ORG_FULL_NAME.key.pem \
       -out $ORG_RCA_DIR/certs/tls-rca.$ORG_FULL_NAME.crt.pem -days 3650 \
       -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=tls-rca.$ORG_FULL_NAME"
+    # => O=tls-ica.$ORG_FULL_NAME will be kept for all
 
     sed -i -e "s#$ORG_RCA_DIR#DIR_NAME#" -e "#$ORG_FULL_NAME#ORG_NAME#" openssl_root.cnf
 
@@ -172,29 +173,30 @@ generateIntermediateCAIdentity() {
     # Creating FABRIC_CA_SERVER crypto-config
     ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity"
 
-    # Creates Private Key
+    # Creates identity for PEERS
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
-      PEER_NAME="peer$j.$ORG_FULL_NAME"
-      PEER_DIR="$ORG_ICA_IDENTITY_DIR/$PEER_NAME" # Peer name start at 0
-      mkdir -p $PEER_DIR
+      IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
+      IDENTITY_DIR="$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME" # Peer name start at 0
+      mkdir -p $IDENTITY_DIR
 
       # Creates private key
       openssl ecparam -name prime256v1 -genkey -noout \
-        -out $PEER_DIR/client.key
+        -out $IDENTITY_DIR/client.key
 
       # Self-sign Certificate
       openssl req -new -sha256 \
-        -key $PEER_DIR/client.key \
-        -out $PEER_DIR/client.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$PEER_NAME"
+        -key $IDENTITY_DIR/client.key \
+        -out $IDENTITY_DIR/client.csr \
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME"
 
       # INTERMEDIATE_CA sign Self-sign Certificate
       openssl ca -batch -config openssl_intermediate.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
-        -in $PEER_DIR/client.csr \
-        -out $PEER_DIR/client.crt
+        -in $IDENTITY_DIR/client.csr \
+        -out $IDENTITY_DIR/client.crt
 
     done
 
+    # Creates identity for USERS
     ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
     for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
@@ -216,6 +218,26 @@ generateIntermediateCAIdentity() {
         -in $IDENTITY_DIR/client.csr \
         -out $IDENTITY_DIR/client.crt
     done
+
+    # Creates TLS CA
+    if [ ! -d $TLS_CA ]; then
+      IDENTITY_NAME="tlsca"
+      IDENTITY_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME
+      mkdir -p $IDENTITY_DIR
+      # Creates private key
+      openssl ecparam -name prime256v1 -genkey -noout \
+        -out $IDENTITY_DIR/client.key
+
+      # Self-sign Certificate
+      openssl req -new -sha256 \
+        -key $IDENTITY_DIR/client.key \
+        -out $IDENTITY_DIR/client.csr \
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$IDENTITY_NAME"
+      # INTERMEDIATE_CA sign Self-sign Certificate
+      openssl ca -batch -config openssl_intermediate.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
+        -in $IDENTITY_DIR/client.csr \
+        -out $IDENTITY_DIR/client.crt
+    fi
 
     # Copy ICA certificate into identity folder
     cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_DIR/ca.crt
@@ -256,7 +278,7 @@ createFabricFolderStructure() {
     done
 
     # ORG TLSCA & MSP
-    # mkdir -p $ORG_FABRIC_DIR/tlsca
+    mkdir -p $ORG_FABRIC_DIR/tlsca
     mkdir -p $ORG_FABRIC_DIR/msp/tlscacerts # $ORG_FABRIC_DIR/msp/tlsintermediatecerts
 
   done
@@ -276,8 +298,11 @@ copyFilesToFabricNetwork() {
     ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity"
     ORG_FABRIC_DIR="$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_FULL_NAME"
 
-    # Copy in Org MSP
+    # Copy TLS ICA in Org MSP
     cp $ORG_ICA_IDENTITY_DIR/ca.crt $ORG_FABRIC_DIR/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
+
+    # Copy TLS_CA in Org MSP
+    cp $ORG_ICA_IDENTITY_DIR/tlsca/* $ORG_FABRIC_DIR/tlsca/
 
     # Copy TLS for PEERS
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
@@ -307,16 +332,6 @@ copyFilesToFabricNetwork() {
   echo "******************************"
   echo
 }
-
-# shipper.logistic/users/Admin@shipper.logistic/msp/tlscacerts/tlsca.shipper.logistic-cert.pem
-# shipper.logistic/users/Admin@shipper.logistic/tls/ca.crt
-# shipper.logistic/users/Admin@shipper.logistic/tls/client.crt
-# shipper.logistic/users/Admin@shipper.logistic/tls/key.crt
-
-# shipper.logistic/peers/peer0.shipper.logistic/msp/tlscacerts/tlsca.shipper.logistic-cert.pem
-# shipper.logistic/users/peer0.shipper.logistic/tls/ca.crt
-# shipper.logistic/users/peer0.shipper.logistic/tls/client.crt
-# shipper.logistic/users/peer0.shipper.logistic/tls/key.crt
 
 createRootCAStructure
 createRootCAPrivateKeyAndCSR

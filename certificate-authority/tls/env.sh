@@ -4,6 +4,7 @@ ORGANIZATION_NAME=(shipper)
 ORGANIZATION_PEER_NUMBER=(2)
 
 ORGANIZATION_USERS_shipper=(admin Admin@$ORGANIZATION_NAME.$DOMAIN)
+TLS_CA=true
 
 # Directories variables
 ROOT_CA_DIR=$PWD

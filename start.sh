@@ -5,8 +5,8 @@ dir=$PWD
 
 $dir/reset.sh
 
-cd $dir/root-ca/certificate && ./build.sh
-cd $dir/root-ca/tls && ./build.sh
+cd $dir/certificate-authority/certificate && ./build.sh
+cd $dir/certificate-authority/tls && ./build.sh
 
 sleep 4
 

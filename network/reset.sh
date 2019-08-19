@@ -11,19 +11,18 @@ if [[ $dockers ]]; then
 fi
 
 # Reset INTERMEDIATE_CA
-if [ ! -z "$CLEAN_ALL" ]; then
-  # Resets crypto-config
-  sudo rm -rf $DIR/crypto-config/*
-  # Resets ca-config
-  sudo rm -rf $DIR/ca-config/*
-  # Copy default config with backdate argument
-  #  cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
-  cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
-  # if set specific ca-server-config
-  # cd $DIR/ca-server-config
-  # sudo rm -rf $(ls | grep -v fabric-ca-server-config*)
-  # cd $DIR
-fi
+
+# Resets crypto-config
+sudo rm -rf $DIR/crypto-config/*
+# Resets ca-config
+sudo rm -rf $DIR/ca-config/*
+# Copy default config with backdate argument
+#  cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
+cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
+# if set specific ca-server-config
+# cd $DIR/ca-server-config
+# sudo rm -rf $(ls | grep -v fabric-ca-server-config*)
+# cd $DIR
 
 # Remove all volumes
 docker volume prune

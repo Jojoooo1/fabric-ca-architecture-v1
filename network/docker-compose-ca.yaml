@@ -20,6 +20,7 @@ services:
     command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/shipper.logistic/ca/:/etc/hyperledger/fabric-ca-server-config # Copy MSP and call it from ENVIRONMENT
+      - ./crypto-config/peerOrganizations/shipper.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config-tls # Copy MSP and call it from ENVIRONMENT
       - ./ca-config/:/etc/hyperledger/fabric-ca-server # Copy fabric-ca-server-config in fabric-ca-server
     networks:
       - basic

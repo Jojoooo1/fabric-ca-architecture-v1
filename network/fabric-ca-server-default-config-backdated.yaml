@@ -68,8 +68,8 @@ tls:
   # Enable TLS (default: false)
   enabled: false
   # TLS for the server's listening port
-  certfile:
-  keyfile:
+  certfile: /etc/hyperledger/fabric-ca-server-config-tls/client.crt
+  keyfile: /etc/hyperledger/fabric-ca-server-config-tls/client.key
   clientauth:
     type: noclientcert
     certfiles:
