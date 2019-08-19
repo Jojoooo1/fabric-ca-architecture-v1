@@ -22,52 +22,50 @@ fi
 createRootCAStructure() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-    echo "Creating ROOT_CA artifacts for ${ORGANIZATION_NAME[$i]}"
-
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    ICA_DIR=ica/ica-${ORGANIZATION_NAME[$i]}
-    # Creates roots & intermediate directory
-    mkdir -p rca-$ORG_NAME/private rca-$ORG_NAME/certs rca-$ORG_NAME/newcerts rca-$ORG_NAME/crl
-    chmod 700 rca-$ORG_NAME/private
-    # Creates CA artifacts
-    touch rca-$ORG_NAME/index.txt rca-$ORG_NAME/serial
+    echo "Creating ROOT_CA artifacts for $ORG_NAME"
 
-    #touch rca-$ORG_NAME/crl/index.txt rca-$ORG_NAME/crl/serial
+    ORG_RCA_DIR=root-ca/rca-$ORG_NAME
+
+    # Creates roots & intermediate directory
+    mkdir -p $ORG_RCA_DIR/private $ORG_RCA_DIR/certs $ORG_RCA_DIR/newcerts $ORG_RCA_DIR/crl
+    chmod 700 $ORG_RCA_DIR/private
+    # Creates CA artifacts
+    touch $ORG_RCA_DIR/index.txt $ORG_RCA_DIR/serial
+
+    #touch $ORG_RCA_DIR/crl/index.txt $ORG_RCA_DIR/crl/serial
 
     # Creates serial number, mandatory for openssl ca config
-    echo 1000 >rca-$ORG_NAME/serial
-    #echo 00 >rca-$ORG_NAME/serial
+    echo 1000 >$ORG_RCA_DIR/serial
+    #echo 00 >$ORG_RCA_DIR/serial
 
   done
   echo "******************************"
   echo
 }
 
-CreateRootCAPrivateKeyAndCSR() {
+createRootCAPrivateKeyAndCSR() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-    echo "Creating ROOT_CA private key and CSR for ${ORGANIZATION_NAME[$i]}"
-
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    ORG_FULL_NAME=${ORGANIZATION_NAME[$i]}.$DOMAIN
-    ORG_CA_DIR=rca-${ORGANIZATION_NAME[$i]}
+    echo "Creating ROOT_CA private key and CSR for $ORG_NAME"
+
+    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+    ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
 
     # Replace Org directory & Org name
-    sed -i "s/DIR_NAME/$ORG_CA_DIR/g" openssl_root.cnf
-    sed -i "s/ORG_NAME/$ORG_FULL_NAME/g" openssl_root.cnf
+    sed -i -e "s#DIR_NAME#$ORG_RCA_DIR#" -e "#ORG_NAME#$ORG_FULL_NAME#" openssl_root.cnf
 
     # Generate private key
     openssl ecparam -name prime256v1 -genkey -noout \
-      -out rca-$ORG_NAME/private/rca.$ORG_FULL_NAME.key.pem
+      -out $ORG_RCA_DIR/private/rca.$ORG_FULL_NAME.key.pem
     # ROOT_CA self-sign his own Certificate Signing Request
     openssl req -config openssl_root.cnf -new -x509 -sha256 -extensions v3_ca \
-      -key rca-$ORG_NAME/private/rca.$ORG_FULL_NAME.key.pem \
-      -out rca-$ORG_NAME/certs/rca.$ORG_FULL_NAME.crt.pem -days 3650 \
+      -key $ORG_RCA_DIR/private/rca.$ORG_FULL_NAME.key.pem \
+      -out $ORG_RCA_DIR/certs/rca.$ORG_FULL_NAME.crt.pem -days 3650 \
       -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=rca.$ORG_FULL_NAME"
 
-    # Reput the default value
-    sed -i "s/$ORG_CA_DIR/DIR_NAME/g" openssl_root.cnf
-    sed -i "s/$ORG_FULL_NAME/ORG_NAME/g" openssl_root.cnf
+    sed -i -e "s#$ORG_RCA_DIR#DIR_NAME#" -e "#$ORG_FULL_NAME#ORG_NAME#" openssl_root.cnf
 
   done
   echo "******************************"
@@ -81,56 +79,54 @@ CreateRootCAPrivateKeyAndCSR() {
 createIntermediateCAPrivateKeyAndCSR() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
+    ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo
-    echo "Creating FABRIC_CA private key and CSR for ${ORGANIZATION_NAME[$i]}"
+    echo "Creating FABRIC_CA private key and CSR for $ORG_NAME"
     echo
 
-    ORG_NAME=${ORGANIZATION_NAME[$i]}
-    ORG_FULL_NAME=${ORGANIZATION_NAME[$i]}.$DOMAIN
-    ORG_CA_DIR=rca-${ORGANIZATION_NAME[$i]}
+    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+    ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
+    ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
 
     #  # Replace Org directory & Org name
-    sed -i "s/DIR_NAME/$ORG_CA_DIR/g" openssl_root.cnf
-    sed -i "s/ORG_NAME/$ORG_FULL_NAME/g" openssl_root.cnf
+    sed -i -e "s#DIR_NAME#$ORG_RCA_DIR#" -e "s#ORG_NAME#$ORG_FULL_NAME#" openssl_root.cnf
 
     # Creating FABRIC_CA_SERVER crypto-config
-    ICA_DIR=ica/ica-${ORGANIZATION_NAME[$i]}
-    mkdir -p $ICA_DIR
+    mkdir -p $ORG_ICA_DIR
 
     # Generate private key
     openssl ecparam -name prime256v1 -genkey -noout \
-      -out $ICA_DIR/ica.$ORG_FULL_NAME.key.pem
+      -out $ORG_ICA_DIR/ica.$ORG_FULL_NAME.key.pem
 
     # INTERMEDIATE_CA self-sign his own Certificate Signing Request
     openssl req -new -sha256 \
-      -key $ICA_DIR/ica.$ORG_FULL_NAME.key.pem \
-      -out $ICA_DIR/ica.$ORG_FULL_NAME.csr \
+      -key $ORG_ICA_DIR/ica.$ORG_FULL_NAME.key.pem \
+      -out $ORG_ICA_DIR/ica.$ORG_FULL_NAME.csr \
       -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=ica.$ORG_FULL_NAME"
 
     # ROOT_CA signs INTERMEDIATE_CA's Certificate Signing Request
     openssl ca -batch -config openssl_root.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
-      -in $ICA_DIR/ica.$ORG_FULL_NAME.csr \
-      -out $ICA_DIR/ica.$ORG_FULL_NAME.crt.pem
+      -in $ORG_ICA_DIR/ica.$ORG_FULL_NAME.csr \
+      -out $ORG_ICA_DIR/ica.$ORG_FULL_NAME.crt.pem
 
-    # Replace by default value
-    sed -i "s/$ORG_CA_DIR/DIR_NAME/g" openssl_root.cnf
-    sed -i "s/$ORG_FULL_NAME/ORG_NAME/g" openssl_root.cnf
+    sed -i -e "s#$ORG_RCA_DIR#DIR_NAME#" -e "s#$ORG_FULL_NAME#ORG_NAME#" openssl_root.cnf
+
   done
   echo "******************************"
   echo
 }
 
-CreateChainFile() {
+createIntermediateCAChain() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-    echo "Creating FABRIC_CA chainfile certificate for ${ORGANIZATION_NAME[$i]}"
-
-    ICA_DIR=ica/ica-${ORGANIZATION_NAME[$i]}
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    ORG_FULL_NAME=${ORGANIZATION_NAME[$i]}.$DOMAIN
-    ORG_FABRIC_CA_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/${ORGANIZATION_NAME[$i]}.$DOMAIN
+    echo "Creating FABRIC_CA chainfile certificate for $ORG_NAME"
 
-    cat $ICA_DIR/ica.$ORG_FULL_NAME.crt.pem rca-$ORG_NAME/certs/rca.$ORG_FULL_NAME.crt.pem >$ICA_DIR/chain.$ORG_FULL_NAME.crt.pem
+    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+    ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
+    ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
+
+    cat $ORG_ICA_DIR/ica.$ORG_FULL_NAME.crt.pem $ORG_RCA_DIR/certs/rca.$ORG_FULL_NAME.crt.pem >$ORG_ICA_DIR/chain.$ORG_FULL_NAME.crt.pem
   done
   echo "******************************"
   echo
@@ -140,24 +136,25 @@ CreateChainFile() {
 ### Creating FABRIC_CA ###
 ##########################
 
-CreateFabricFolderStructure() {
+createFabricFolderStructure() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-    echo "Creating Fabric network crypto-config folder structure for ${ORGANIZATION_NAME[$i]}"
+    ORG_NAME=${ORGANIZATION_NAME[$i]}
+    echo "Creating Fabric network crypto-config folder structure for $ORG_NAME"
 
     # Orgs directory
-    ORG_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/${ORGANIZATION_NAME[$i]}.$DOMAIN
+    ORG_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
 
     # Creates Peer's org MSP directory
     for j in 1 ${ORGANIZATION_PEER_NUMBER[$i]}; do
-      PEER_DIR=$ORG_DIR/peers/peer$(($j - 1)).${ORGANIZATION_NAME[$i]}.$DOMAIN # Peer name start at 0
-      mkdir -p $PEER_DIR/msp/admincerts                                        # Other directory will be created by fabric-ca-client
+      PEER_DIR=$ORG_DIR/peers/peer$(($j - 1)).$ORG_NAME.$DOMAIN # Peer name start at 0
+      mkdir -p $PEER_DIR/msp/admincerts                         # Other directory will be created by fabric-ca-client
       # $PEER_DIR/msp/intermediatecerts will be automatically created
     done
 
     # Users
     REGISTRAR_DIR=$ORG_DIR/users/admin # default identity used at fabric-ca-server instantiation # Will register the others identities
-    ADMIN_DIR=$ORG_DIR/users/Admin@${ORGANIZATION_NAME[$i]}.$DOMAIN/msp/admincerts
+    ADMIN_DIR=$ORG_DIR/users/Admin@$ORG_NAME.$DOMAIN/msp/admincerts
     mkdir -p $REGISTRAR_DIR $ADMIN_DIR
 
     # CA & MSP
@@ -168,22 +165,23 @@ CreateFabricFolderStructure() {
   echo
 }
 
-CopyFilesToFabricCryptoConfig() {
+copyFilesToFabricCryptoConfig() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-    echo "Copying FABRIC_CA Certificate to network folder for ${ORGANIZATION_NAME[$i]}"
+    ORG_NAME=${ORGANIZATION_NAME[$i]}
+    echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
 
-    ICA_DIR=ica/ica-${ORGANIZATION_NAME[$i]}
-    ORG_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/${ORGANIZATION_NAME[$i]}.$DOMAIN
-    cp $ICA_DIR/* $ORG_DIR/ca/
+    ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
+    ORG_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
+    cp $ORG_ICA_DIR/* $ORG_DIR/ca/
   done
   echo "******************************"
   echo
 }
 
 createRootCAStructure
-CreateRootCAPrivateKeyAndCSR
-CreateFabricFolderStructure
+createRootCAPrivateKeyAndCSR
+createFabricFolderStructure
 createIntermediateCAPrivateKeyAndCSR
-CreateChainFile
-CopyFilesToFabricCryptoConfig
+createIntermediateCAChain
+copyFilesToFabricCryptoConfig

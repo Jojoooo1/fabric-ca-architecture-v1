@@ -30,7 +30,7 @@ createFabricCAPrivateKeyAndCSR() {
   sed -i "s/ORG_NAME/$ORG_FULL_NAME/g" openssl_root.cnf
 
   # Creating FABRIC_CA_SERVER crypto-config
-  ICA_DIR=$NEW_ORGANIZATION_PREFIX-$ORGANIZATION_NAME
+  ICA_DIR=ica/$NEW_ORGANIZATION_PREFIX-$ORGANIZATION_NAME
   mkdir -p $ICA_DIR
 
   # Generate private key
@@ -61,7 +61,7 @@ CreateChainFile() {
 
   ORG_NAME=$ORGANIZATION_NAME
   ORG_FULL_NAME=$ORGANIZATION_NAME.$DOMAIN
-  ORG_FABRIC_CA_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORGANIZATION_NAME.$DOMAIN
+  ICA_DIR=ica/$NEW_ORGANIZATION_PREFIX-$ORGANIZATION_NAME
 
   cat $ICA_DIR/$NEW_ORGANIZATION_PREFIX.$ORG_FULL_NAME.crt.pem rca-$ORG_NAME/certs/rca.$ORG_FULL_NAME.crt.pem >$ICA_DIR/chain.$ORG_FULL_NAME.crt.pem
   echo "******************************"
