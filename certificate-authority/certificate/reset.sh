@@ -1,19 +1,25 @@
 #!/bin/bash
 set -e
 
-ROOT_CA_DIR=$PWD
-FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
+# import variable
+. ./env.sh
 
 # Remove ROOT_CA_CONFIG
 rm -rf root-ca/*
 rm -rf intermediate-ca/*
 
-# Remove FABRIC_CA_CONFIG
-if [ -d $FABRIC_CA_DIR ]; then
-  cd $FABRIC_CA_DIR
-  ./reset.sh "CLEAN_ALL"
-  cd $ROOT_CA_DIR
-  echo "FABRIC_CA certificates were removed successfully from crypto-config folder"
-fi
+echo "ROOT & INTERMEDIATE certificates were removed successfully"
 
-echo "Identity certificates were removed successfully"
+# Remove FABRIC_CA_TLS
+cd $FABRIC_CA_DIR
+
+for i in ${!ORGANIZATION_NAME[@]}; do
+  ORG_NAME=${ORGANIZATION_NAME[$i]}
+  echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
+
+  ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
+  rm -rf $ORG_FABRIC_DIR/ca/*
+
+  cd $ROOT_CA_DIR
+  echo "FABRIC certificates were removed successfully from crypto-config folder"
+done

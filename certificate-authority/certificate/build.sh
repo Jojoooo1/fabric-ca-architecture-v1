@@ -1,14 +1,8 @@
 #!/bin/bash
 set -e
 
-# Organisations variables
-DOMAIN=logistic
-ORGANIZATION_NAME=(shipper)
-ORGANIZATION_PEER_NUMBER=(2)
-
-# Directories variables
-ROOT_CA_DIR=$PWD
-FABRIC_CA_DIR=$ROOT_CA_DIR/../../network # Fabric CA is created as intermediate CA
+# import variable
+. ./env.sh
 
 if [ ! -d $FABRIC_CA_DIR ]; then
   echo "Build failed, Fabric network directory not found"
