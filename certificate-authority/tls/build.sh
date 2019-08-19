@@ -203,8 +203,8 @@ generateIntermediateParticipantCertificate() {
 
     done
 
-    IDENTITY=ORGANIZATION_USERS_$ORG_NAME
-    for j in ${IDENTITY[@]}; do
+    ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
+    for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
       IDENTITY_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME # Peer name start at 0
       mkdir -p $IDENTITY_DIR                            # Other directory will be created by fabric-ca-client
@@ -253,9 +253,8 @@ createFabricFolderStructure() {
       mkdir -p "$PEER_DIR/msp/tlscacerts" "$PEER_DIR/tls" # Other directory will be created by fabric-ca-client
     done
 
-    # Users TLSCA & TLS
-    IDENTITY=ORGANIZATION_USERS_$ORG_NAME
-    for j in ${IDENTITY[@]}; do
+    ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
+    for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
       IDENTITY_DIR=$ORG_FABRIC_DIR/users/$IDENTITY_NAME
       mkdir -p "$IDENTITY_DIR/msp/tlscacerts" -p "$IDENTITY_DIR/tls"
@@ -296,8 +295,8 @@ copyFilesToFabricCryptoConfig() {
     done
 
     # Users TLSCA & TLS
-    IDENTITY=ORGANIZATION_USERS_$ORG_NAME
-    for j in ${IDENTITY[@]}; do
+    ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
+    for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
       # Copy in FABRIC identity folder
       cp $ORG_ICA_IDENTITY_DIR/ca.crt $ORG_FABRIC_DIR/users/$IDENTITY_NAME/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
@@ -330,4 +329,4 @@ createIntermediateCAChain
 generateIntermediateParticipantCertificate
 
 createFabricFolderStructure
-copyFilesToFabricCryptoConfig
+# copyFilesToFabricCryptoConfig
