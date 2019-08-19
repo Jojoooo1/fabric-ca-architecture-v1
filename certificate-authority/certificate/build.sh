@@ -8,7 +8,7 @@ ORGANIZATION_PEER_NUMBER=(2)
 
 # Directories variables
 ROOT_CA_DIR=$PWD
-FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
+FABRIC_CA_DIR=$ROOT_CA_DIR/../../network # Fabric CA is created as intermediate CA
 
 if [ ! -d $FABRIC_CA_DIR ]; then
   echo "Build failed, Fabric network directory not found"
@@ -143,22 +143,23 @@ createFabricFolderStructure() {
     echo "Creating Fabric network crypto-config folder structure for $ORG_NAME"
 
     # Orgs directory
-    ORG_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
+    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+    ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_FULL_NAME
 
     # Creates Peer's org MSP directory
     for j in 1 ${ORGANIZATION_PEER_NUMBER[$i]}; do
-      PEER_DIR=$ORG_DIR/peers/peer$(($j - 1)).$ORG_NAME.$DOMAIN # Peer name start at 0
-      mkdir -p $PEER_DIR/msp/admincerts                         # Other directory will be created by fabric-ca-client
+      PEER_DIR=$ORG_FABRIC_DIR/peers/peer$(($j - 1)).$ORG_FULL_NAME # Peer name start at 0
+      mkdir -p $PEER_DIR/msp/admincerts                             # Other directory will be created by fabric-ca-client
       # $PEER_DIR/msp/intermediatecerts will be automatically created
     done
 
     # Users
-    REGISTRAR_DIR=$ORG_DIR/users/admin # default identity used at fabric-ca-server instantiation # Will register the others identities
-    ADMIN_DIR=$ORG_DIR/users/Admin@$ORG_NAME.$DOMAIN/msp/admincerts
+    REGISTRAR_DIR=$ORG_FABRIC_DIR/users/admin # default identity used at fabric-ca-server instantiation # Will register the others identities
+    ADMIN_DIR=$ORG_FABRIC_DIR/users/Admin@$ORG_FULL_NAME/msp/admincerts
     mkdir -p $REGISTRAR_DIR $ADMIN_DIR
 
     # CA & MSP
-    mkdir -p $ORG_DIR/ca $ORG_DIR/msp/admincerts $ORG_DIR/msp/cacerts $ORG_DIR/msp/intermediatecerts # Peers intermediatecerts will be automatically created
+    mkdir -p $ORG_FABRIC_DIR/ca $ORG_FABRIC_DIR/msp/admincerts $ORG_FABRIC_DIR/msp/cacerts $ORG_FABRIC_DIR/msp/intermediatecerts # Peers intermediatecerts will be automatically created
 
   done
   echo "******************************"
@@ -172,8 +173,8 @@ copyFilesToFabricCryptoConfig() {
     echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
 
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
-    ORG_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
-    cp $ORG_ICA_DIR/* $ORG_DIR/ca/
+    ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
+    cp $ORG_ICA_DIR/* $ORG_FABRIC_DIR/ca/
   done
   echo "******************************"
   echo

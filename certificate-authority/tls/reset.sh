@@ -16,4 +16,6 @@ if [ -d $FABRIC_CA_DIR ]; then
   echo "FABRIC_CA certificates were removed successfully from crypto-config folder"
 fi
 
-echo "ROOT_CA certificates were removed successfully"
+echo "Identity certificates were removed successfully"
+
+echo "TLS certificates were removed successfully"
