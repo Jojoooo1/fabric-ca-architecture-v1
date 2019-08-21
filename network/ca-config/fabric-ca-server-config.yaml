@@ -66,10 +66,10 @@ crlsizelimit: 512000
 #############################################################################
 tls:
   # Enable TLS (default: false)
-  enabled: false
+  enabled: true
   # TLS for the server's listening port
-  certfile: /etc/hyperledger/fabric-ca-server-config-tls/client.crt
-  keyfile: /etc/hyperledger/fabric-ca-server-config-tls/client.key
+  certfile: /etc/hyperledger/fabric-ca-server-config-tls/server.crt
+  keyfile: /etc/hyperledger/fabric-ca-server-config-tls/server.key
   clientauth:
     type: noclientcert
     certfiles:

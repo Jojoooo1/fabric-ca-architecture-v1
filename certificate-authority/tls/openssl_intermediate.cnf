@@ -34,7 +34,7 @@ name_opt          = ca_default
 cert_opt          = ca_default
 default_days      = 375 # for how many days will the signed certificate be valid
 preserve          = no
-policy            = policy_strict
+policy            = policy_loose
 
 [ policy_strict ]
 # The root CA should only sign intermediate certificates that match.
