@@ -21,10 +21,10 @@ createRootCAStructure() {
 
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
 
-    # Creates roots & intermediate directory
+    # Creates RCA directory
     mkdir -p $ORG_RCA_DIR/private $ORG_RCA_DIR/certs $ORG_RCA_DIR/newcerts $ORG_RCA_DIR/crl
     chmod 700 $ORG_RCA_DIR/private
-    # Creates CA artifacts
+    # Creates RCA artifacts
     touch $ORG_RCA_DIR/index.txt $ORG_RCA_DIR/serial
 
     #touch $ORG_RCA_DIR/crl/index.txt $ORG_RCA_DIR/crl/serial
@@ -47,20 +47,21 @@ createRootCAPrivateKeyAndCSR() {
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
 
-    # Replace Org directory & Org name
+    # Replace Org directory & Org name in config file
     sed -i -e "s#DIR_NAME#$ORG_RCA_DIR#" -e "#ORG_NAME#$ORG_FULL_NAME#" openssl_root.cnf
 
-    # Generate private key
+    # Creates RCA_TLS certificate
+    # Generates private key
     openssl ecparam -name prime256v1 -genkey -noout \
       -out $ORG_RCA_DIR/private/tls-rca.$ORG_FULL_NAME.key.pem
-
-    # ROOT_CA self-sign his own Certiftls-icate Signing Request
+    # Creates certificate
     openssl req -config openssl_root.cnf -new -x509 -sha256 -extensions v3_ca \
       -key $ORG_RCA_DIR/private/tls-rca.$ORG_FULL_NAME.key.pem \
       -out $ORG_RCA_DIR/certs/tls-rca.$ORG_FULL_NAME.crt.pem -days 3650 \
-      -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=tls-rca.$ORG_FULL_NAME"
+      -subj "/C=BR/ST=São Paulo/O=$ORG_FULL_NAME/OU=/CN=tls-rca.$ORG_FULL_NAME"
     # => O=tls-ica.$ORG_FULL_NAME will be kept for all
 
+    # Reput default value in config file
     sed -i -e "s#$ORG_RCA_DIR#DIR_NAME#" -e "#$ORG_FULL_NAME#ORG_NAME#" openssl_root.cnf
 
   done
@@ -82,10 +83,10 @@ createIntermediateCAStructure() {
 
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
 
-    # Creates roots & intermediate directory
+    # Creates ICA directory
     mkdir -p $ORG_ICA_DIR/private $ORG_ICA_DIR/certs $ORG_ICA_DIR/newcerts $ORG_ICA_DIR/crl
     chmod 700 $ORG_ICA_DIR/private
-    # Creates CA artifacts
+    # Creates ICA artifacts
     touch $ORG_ICA_DIR/index.txt $ORG_ICA_DIR/serial
 
     #touch $ORG_ICA_DIR/crl/index.txt $ORG_ICA_DIR/crl/serial
@@ -111,24 +112,26 @@ createIntermediateCAPrivateKeyAndCSR() {
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
 
-    #  Replace Org directory & Org name
+    #  Replace Org directory & Org name in config file
     sed -i -e "s#DIR_NAME#$ORG_RCA_DIR#" -e "s#ORG_NAME#$ORG_FULL_NAME#" openssl_root.cnf
 
-    # Generate private key
+    # Creates ICA_TLS certificate
+    # Generates private key
     openssl ecparam -name prime256v1 -genkey -noout \
       -out $ORG_ICA_DIR/private/tls-ica.$ORG_FULL_NAME.key.pem
 
-    # INTERMEDIATE_CA self-sign his own Certificate Signing Request
+    # Creates certificate
     openssl req -new -sha256 \
       -key $ORG_ICA_DIR/private/tls-ica.$ORG_FULL_NAME.key.pem \
       -out $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.csr -days 3650 \
-      -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=tls-ica.$ORG_FULL_NAME"
+      -subj "/C=BR/ST=São Paulo/O=$ORG_FULL_NAME/OU=/CN=tls-ica.$ORG_FULL_NAME"
 
-    # ROOT_CA signs INTERMEDIATE_CA's Certificate Signing Request
+    # RCA signs certificate
     openssl ca -batch -config openssl_root.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
       -in $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.csr \
       -out $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem
 
+    # Reput default value in config file
     sed -i -e "s#$ORG_RCA_DIR#DIR_NAME#" -e "s#$ORG_FULL_NAME#ORG_NAME#" openssl_root.cnf
 
   done
@@ -166,82 +169,88 @@ generateIntermediateCAIdentity() {
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
+    ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity"
 
     #  Replace Org directory & Org name
     sed -i -e "s#DIR_NAME#$ORG_ICA_DIR#" -e "s#ORG_NAME#$ORG_FULL_NAME#" openssl_intermediate.cnf
 
-    # Creating FABRIC_CA_SERVER crypto-config
-    ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity"
-
-    # Creates identity for PEERS
+    # Creates TLS certificates for PEERS
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
       IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
-      IDENTITY_DIR="$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME" # Peer name start at 0
-      mkdir -p $IDENTITY_DIR
+      ORG_ICA_IDENTITY_PEERS_DIR="$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME" # Peer name start at 0
+      mkdir -p $ORG_ICA_IDENTITY_PEERS_DIR
 
       # Creates private key
       openssl ecparam -name prime256v1 -genkey -noout \
-        -out $IDENTITY_DIR/client.key
+        -out $ORG_ICA_IDENTITY_PEERS_DIR/client.key
 
-      # Self-sign Certificate
+      # Creates certificate
       openssl req -new -sha256 \
-        -key $IDENTITY_DIR/client.key \
-        -out $IDENTITY_DIR/client.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME"
+        -key $ORG_ICA_IDENTITY_PEERS_DIR/client.key \
+        -out $ORG_ICA_IDENTITY_PEERS_DIR/client.csr \
+        -subj "/C=BR/ST=São Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME"
 
-      # INTERMEDIATE_CA sign Self-sign Certificate
+      # ICA sign certificate
       openssl ca -batch -config openssl_intermediate.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
-        -in $IDENTITY_DIR/client.csr \
-        -out $IDENTITY_DIR/client.crt
+        -in $ORG_ICA_IDENTITY_PEERS_DIR/client.csr \
+        -out $ORG_ICA_IDENTITY_PEERS_DIR/client.crt
 
+      # Copy ICA cert in peer folder
+      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_PEERS_DIR/ca.crt
     done
 
-    # Creates identity for USERS
+    # Creates TLS certificates for USERS
     ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
     for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
-      IDENTITY_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME # Peer name start at 0
-      mkdir -p $IDENTITY_DIR                            # Other directory will be created by fabric-ca-client
+      ORG_ICA_IDENTITY_USERS_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME # Peer name start at 0
+      mkdir -p $ORG_ICA_IDENTITY_USERS_DIR                            # Other directory will be created by fabric-ca-client
 
       # Creates private key
       openssl ecparam -name prime256v1 -genkey -noout \
-        -out $IDENTITY_DIR/client.key
+        -out $ORG_ICA_IDENTITY_USERS_DIR/client.key
 
-      # Self-sign Certificate
+      # Creates certificate
       openssl req -new -sha256 \
-        -key $IDENTITY_DIR/client.key \
-        -out $IDENTITY_DIR/client.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME"
+        -key $ORG_ICA_IDENTITY_USERS_DIR/client.key \
+        -out $ORG_ICA_IDENTITY_USERS_DIR/client.csr \
+        -subj "/C=BR/ST=São Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME"
 
-      # INTERMEDIATE_CA sign Self-sign Certificate
+      # ICA sign certificate
       openssl ca -batch -config openssl_intermediate.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
-        -in $IDENTITY_DIR/client.csr \
-        -out $IDENTITY_DIR/client.crt
+        -in $ORG_ICA_IDENTITY_USERS_DIR/client.csr \
+        -out $ORG_ICA_IDENTITY_USERS_DIR/client.crt
+
+      # Copy ICA cert in user folder
+      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_USERS_DIR/ca.crt
     done
 
-    # Creates TLS CA
+    # Creates TLS certificates for Fabric CA
     if [ ! -d $TLS_CA ]; then
       IDENTITY_NAME="tlsca"
-      IDENTITY_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME
-      mkdir -p $IDENTITY_DIR
+      ORG_ICA_IDENTITY_CA_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME
+      mkdir -p $ORG_ICA_IDENTITY_CA_DIR
+
       # Creates private key
       openssl ecparam -name prime256v1 -genkey -noout \
-        -out $IDENTITY_DIR/client.key
+        -out $ORG_ICA_IDENTITY_CA_DIR/client.key
 
-      # Self-sign Certificate
+      # Creates certificate
       openssl req -new -sha256 \
-        -key $IDENTITY_DIR/client.key \
-        -out $IDENTITY_DIR/client.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$IDENTITY_NAME"
-      # INTERMEDIATE_CA sign Self-sign Certificate
+        -key $ORG_ICA_IDENTITY_CA_DIR/client.key \
+        -out $ORG_ICA_IDENTITY_CA_DIR/client.csr \
+        -subj "/C=BR/ST=São Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$ORG_FULL_NAME"
+
+      # ICA sign certificate
       openssl ca -batch -config openssl_intermediate.cnf -extensions v3_intermediate_ca -days 1825 -notext -md sha256 \
-        -in $IDENTITY_DIR/client.csr \
-        -out $IDENTITY_DIR/client.crt
+        -in $ORG_ICA_IDENTITY_CA_DIR/client.csr \
+        -out $ORG_ICA_IDENTITY_CA_DIR/client.crt
     fi
 
     # Copy ICA certificate into identity folder
     cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_DIR/ca.crt
 
+    # Reput default value in config file
     sed -i -e "s#$ORG_ICA_DIR#DIR_NAME#" -e "s#$ORG_FULL_NAME#ORG_NAME#" openssl_intermediate.cnf
 
   done
@@ -259,25 +268,25 @@ createFabricFolderStructure() {
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo "Creating Fabric network crypto-config folder structure for $ORG_NAME"
 
-    # Orgs directory
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_FABRIC_DIR="$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_FULL_NAME"
 
-    # Creates TLS for Peers & User & Orgs
+    # Creates TLS folder for Peers
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
-      PEER_NAME="peer$j.$ORG_FULL_NAME"
-      PEER_DIR="$ORG_FABRIC_DIR/peers/$PEER_NAME"         # Peer name start at 0
-      mkdir -p "$PEER_DIR/msp/tlscacerts" "$PEER_DIR/tls" # Other directory will be created by fabric-ca-client
+      IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
+      ORG_FABRIC_IDENTITY_PEERS_DIR="$ORG_FABRIC_DIR/peers/$IDENTITY_NAME"                          # Peer name start at 0
+      mkdir -p "$ORG_FABRIC_IDENTITY_PEERS_DIR/msp/tlscacerts" "$ORG_FABRIC_IDENTITY_PEERS_DIR/tls" # Other directory will be created by fabric-ca-client
     done
 
+    # Creates TLS folder for Users
     ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
     for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
-      IDENTITY_DIR=$ORG_FABRIC_DIR/users/$IDENTITY_NAME
-      mkdir -p "$IDENTITY_DIR/msp/tlscacerts" -p "$IDENTITY_DIR/tls"
+      ORG_FABRIC_IDENTITY_USERS_DIR=$ORG_FABRIC_DIR/users/$IDENTITY_NAME
+      mkdir -p "$ORG_FABRIC_IDENTITY_USERS_DIR/msp/tlscacerts" -p "$ORG_FABRIC_IDENTITY_USERS_DIR/tls"
     done
 
-    # ORG TLSCA & MSP
+    # Creates TLS folder for Orgs
     mkdir -p $ORG_FABRIC_DIR/tlsca
     mkdir -p $ORG_FABRIC_DIR/msp/tlscacerts # $ORG_FABRIC_DIR/msp/tlsintermediatecerts
 
@@ -287,7 +296,7 @@ createFabricFolderStructure() {
   echo
 }
 
-copyFilesToFabricNetwork() {
+copyFilesToFabricFolder() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
@@ -301,7 +310,7 @@ copyFilesToFabricNetwork() {
     # Copy TLS ICA in Org MSP
     cp $ORG_ICA_IDENTITY_DIR/ca.crt $ORG_FABRIC_DIR/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
 
-    # Copy TLS_CA in Org MSP
+    # Copy TLS CA in Org MSP
     cp $ORG_ICA_IDENTITY_DIR/tlsca/* $ORG_FABRIC_DIR/tlsca/
 
     # Copy TLS for PEERS
@@ -343,4 +352,4 @@ createIntermediateCAChain
 generateIntermediateCAIdentity
 
 createFabricFolderStructure
-copyFilesToFabricNetwork
+copyFilesToFabricFolder
