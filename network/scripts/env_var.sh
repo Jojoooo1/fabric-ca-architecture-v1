@@ -1,7 +1,7 @@
 export COMPOSE_PROJECT_NAME=net
 export IMAGE_TAG=latest
-export CORE_PEER_TLS_ENABLED=false
-export CA_TLS_ENABLED=false
+export CORE_PEER_TLS_ENABLED=true
+export CA_TLS_ENABLED=true
 
 # ----------------------
 COMPOSE_FILE_CLI=docker-compose-cli.yaml
@@ -29,7 +29,7 @@ ORGANIZATION_MSPID=(${ORGANIZATION_NAME[0]}MSP)
 ORGANIZATION_DOMAIN=(${ORGANIZATION_NAME[0],,}.${DOMAIN}) # ORGANIZATION_NAME in minuscula
 # ORGANIZATION_DOMAIN=(${ORGANIZATION_NAME[0],,}.${DOMAIN} ${ORGANIZATION_NAME[1],,}.${DOMAIN} ${ORGANIZATION_NAME[2],,}.${DOMAIN}) # ORGANIZATION_NAME in minuscula
 
-ORGANIZATION_PEER_NUMBER=(1)           # Template count in crypto-config && modify docker-compose
+ORGANIZATION_PEER_NUMBER=(2)           # Template count in crypto-config && modify docker-compose
 ORGANIZATION_PEER_STARTING_PORT=(7051) # PORT START NUMBER
 
 # ORDERER_TYPE="raft"

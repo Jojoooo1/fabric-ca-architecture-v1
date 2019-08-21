@@ -21,7 +21,7 @@ fi
 
 docker-compose -f docker-compose-ca.yaml up -d ica.shipper.logistic
 
-sleep 10
+sleep 15 # wait for certificate to be Active
 
 # export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/peers/peer0.$ORG_NAME.$ORG_DOMAIN/tls/tls-ica.shipper.logistic.crt.pem
 # export FABRIC_CA_CLIENT_HOME=$REGISTRAR_DIR

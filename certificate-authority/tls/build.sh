@@ -229,7 +229,7 @@ generateIntermediateCAIdentity() {
         -config openssl_intermediate.cnf \
         -key $ORG_ICA_IDENTITY_USERS_DIR/client.key \
         -out $ORG_ICA_IDENTITY_USERS_DIR/client.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME"
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$ORG_FULL_NAME"
 
       # ICA sign CSR
       openssl ca -batch \
@@ -258,13 +258,14 @@ generateIntermediateCAIdentity() {
         -config openssl_intermediate.cnf \
         -key $ORG_ICA_IDENTITY_CA_DIR/server.key \
         -out $ORG_ICA_IDENTITY_CA_DIR/server.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$ORG_FULL_NAME" # x509: certificate is not valid for any names, but wanted to match localhost
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.shipper.logistic" # x509: certificate is not valid for any names, but wanted to match localhost
       # /CN=$IDENTITY_NAME.$ORG_FULL_NAME
 
       # ICA sign CSR
       openssl ca -batch \
         -config openssl_intermediate.cnf \
         -extensions server_cert -days 365 -notext -md sha256 \
+        -extensions req_ext -days 365 -notext -md sha256 \
         -in $ORG_ICA_IDENTITY_CA_DIR/server.csr \
         -out $ORG_ICA_IDENTITY_CA_DIR/server.crt
     fi

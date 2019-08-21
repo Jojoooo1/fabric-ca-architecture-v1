@@ -14,6 +14,7 @@ ORG_DIR=$PWD/crypto-config/peerOrganizations/$ORG_FULLNAME
 REGISTRAR_DIR=$ORG_DIR/users/admin # default identity used at fabric-ca-server instantiation # Will register the others identities
 ADMIN_DIR=$ORG_DIR/users/Admin@$ORG_FULLNAME
 PEER_DIR=$ORG_DIR/peers/peer0.$ORG_FULLNAME
+PEER_DIR_2=$ORG_DIR/peers/peer1.$ORG_FULLNAME
 
 if [ ! -d $ORG_DIR ] || [ ! -d $REGISTRAR_DIR ] || [ ! -d $ADMIN_DIR ] || [ ! -d $PEER_DIR ]; then
   echo "Build failed, Please build ROOT_CA artifacts first"
@@ -44,7 +45,7 @@ fabric-ca-client enroll --csr.names "O=$ORG_FULLNAME,L=Sao Paulo,ST=Sao Paulo,C=
 # [INFO] Stored Issuer public key at users/admin/msp/IssuerPublicKey
 # [INFO] Stored Issuer revocation public key at users/admin/msp/IssuerRevocationPublicKey
 
-sleep 10
+sleep 15 # wait for certificate to be Active
 
 echo
 echo "##########################################################################"
@@ -56,6 +57,7 @@ fabric-ca-client register --id.name Admin@$ORG_FULLNAME --id.secret mysecret --i
 # [INFO] Configuration file location: shipper.logistic/users/admin/fabric-ca-client-config.yaml
 fabric-ca-client register --id.name peer0.$ORG_FULLNAME --id.secret mysecret --id.type peer -u https://localhost:7054 # --id.attrs '"hf.Registrar.Roles=peer,client"' --id.attrs hf.Revoker=true
 # [INFO] Configuration file location: shipper.logistic/users/admin/fabric-ca-client-config.yaml
+fabric-ca-client register --id.name peer1.$ORG_FULLNAME --id.secret mysecret --id.type peer -u https://localhost:7054 # --id.attrs '"hf.Registrar.Roles=peer,client"' --id.attrs hf.Revoker=true
 
 sleep 1
 
@@ -82,6 +84,14 @@ fabric-ca-client enroll \
 # Copying Admin@$ORG_FULLNAME cert in admincerts folder to follow MSP structure
 cp $ADMIN_DIR/msp/signcerts/*.pem $ADMIN_DIR/msp/admincerts/
 
+export FABRIC_CA_CLIENT_HOME=$PEER_DIR_2 # loads identity $ORG_DIR/peers/peer0.$ORG_FULLNAME
+fabric-ca-client enroll \
+  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=org1.$ORG_DOMAIN" \
+  -m peer1.$ORG_FULLNAME -u https://peer1.$ORG_FULLNAME:mysecret@localhost:7054
+
+# Copying Admin@$ORG_FULLNAME cert in admincerts folder to follow MSP structure
+cp $ADMIN_DIR/msp/signcerts/*.pem $ADMIN_DIR/msp/admincerts/
+
 sleep 1
 
 echo
@@ -93,3 +103,8 @@ cp $ADMIN_DIR/msp/signcerts/*.pem $ORG_DIR/msp/admincerts/
 # Copy ca certs & intermediatecerts (taken from dir created by ca) in Org MSP
 cp $PEER_DIR/msp/cacerts/*.pem $ORG_DIR/msp/cacerts/
 cp $PEER_DIR/msp/intermediatecerts/*.pem $ORG_DIR/msp/intermediatecerts/
+# Copy ca certs & intermediatecerts (taken from dir created by ca) in Org MSP
+cp $PEER_DIR_2/msp/cacerts/*.pem $ORG_DIR/msp/cacerts/
+cp $PEER_DIR_2/msp/intermediatecerts/*.pem $ORG_DIR/msp/intermediatecerts/
+
+# ./build.sh && ./start.sh

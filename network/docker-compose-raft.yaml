@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 
 volumes:
   intelipost.logistic:
@@ -9,70 +9,67 @@ networks:
   basic:
 
 services:
-  intelipost.logistic:
-    container_name: intelipost.logistic
-    image: hyperledger/fabric-orderer:1.4.1
-    environment:
-      - ORDERER_GENERAL_LOGLEVEL=DEBUG
-      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-      - ORDERER_GENERAL_GENESISMETHOD=file
-      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
-      - ORDERER_GENERAL_LOCALMSPID=IntelipostMSP
-      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
-    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
-    command: orderer
-    ports:
-      - 7050:7050
-    volumes:
-        - ./channel-artifacts/:/etc/hyperledger/configtx
-        - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/:/etc/hyperledger/msp/orderer
-    networks:
-      - basic
-
   # intelipost.logistic:
   #   container_name: intelipost.logistic
-  #   restart: always
-  #   extends:
-  #     file: base/orderer-base.yaml
-  #     service: orderer-base
-  #   networks:
-  #     - basic
-  #   volumes:
-  #     - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-  #     - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/msp:/var/hyperledger/orderer/msp
-  #     - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/tls/:/var/hyperledger/orderer/tls
-  #     - intelipost.logistic:/var/hyperledger/production/orderer # i. chains/ ii. index/ => These two folders are required to recreate the orderer.
+  #   image: hyperledger/fabric-orderer:1.4.1
+  #   environment:
+  #     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+  #     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+  #     - ORDERER_GENERAL_GENESISMETHOD=file
+  #     - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
+  #     - ORDERER_GENERAL_LOCALMSPID=IntelipostMSP
+  #     - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
+  #   working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+  #   command: orderer
   #   ports:
   #     - 7050:7050
-      
-  # intelipost2.logistic:
-  #   container_name: intelipost2.logistic
-  #   restart: always
-  #   extends:
-  #     file: base/orderer-base.yaml
-  #     service: orderer-base
+  #   volumes:
+  #       - ./channel-artifacts/:/etc/hyperledger/configtx
+  #       - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/:/etc/hyperledger/msp/orderer
   #   networks:
   #     - basic
-  #   volumes:
-  #     - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-  #     - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost2.logistic/msp:/var/hyperledger/orderer/msp
-  #     - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost2.logistic/tls/:/var/hyperledger/orderer/tls
-  #     - intelipost2.logistic:/var/hyperledger/production/orderer
-  #   ports:
-  #     - 8050:7050
-
-  # intelipost3.logistic:
-  #   container_name: intelipost3.logistic
-  #   restart: always
-  #   extends:
-  #     file: base/orderer-base.yaml
-  #     service: orderer-base
-  #   networks:
-  #     - basic
-  #   volumes:
-  #     - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-  #     - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost3.logistic/msp:/var/hyperledger/orderer/msp
-  #     - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost3.logistic/tls/:/var/hyperledger/orderer/tls
-  #     - intelipost3.logistic:/var/hyperledger/production/orderer
-  #   ports:
-  #     - 9050:7050
+  intelipost.logistic:
+    container_name: intelipost.logistic
+    restart: always
+    extends:
+      file: base/orderer-base.yaml
+      service: orderer-base
+    networks:
+      - basic
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/tls/:/var/hyperledger/orderer/tls
+      - intelipost.logistic:/var/hyperledger/production/orderer # i. chains/ ii. index/ => These two folders are required to recreate the orderer.
+    ports:
+      - 7050:7050
+  intelipost2.logistic:
+    container_name: intelipost2.logistic
+    restart: always
+    extends:
+      file: base/orderer-base.yaml
+      service: orderer-base
+    networks:
+      - basic
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost2.logistic/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost2.logistic/tls/:/var/hyperledger/orderer/tls
+      - intelipost2.logistic:/var/hyperledger/production/orderer
+    ports:
+      - 8050:7050
+  intelipost3.logistic:
+    container_name: intelipost3.logistic
+    restart: always
+    extends:
+      file: base/orderer-base.yaml
+      service: orderer-base
+    networks:
+      - basic
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost3.logistic/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost3.logistic/tls/:/var/hyperledger/orderer/tls
+      - intelipost3.logistic:/var/hyperledger/production/orderer
+    ports:
+      - 9050:7050
