@@ -14,6 +14,8 @@ fi
 
 # Resets crypto-config
 sudo rm -rf $DIR/crypto-config/*
+sudo rm -rf $DIR/channel-artifacts/*
+
 # Resets ca-config
 sudo rm -rf $DIR/ca-config/*
 # Copy default config with backdate argument

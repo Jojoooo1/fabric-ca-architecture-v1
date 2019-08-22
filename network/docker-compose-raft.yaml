@@ -1,33 +1,14 @@
 version: "2"
 
+networks:
+  basic:
+
 volumes:
   intelipost.logistic:
   intelipost2.logistic:
   intelipost3.logistic:
 
-networks:
-  basic:
-
 services:
-  # intelipost.logistic:
-  #   container_name: intelipost.logistic
-  #   image: hyperledger/fabric-orderer:1.4.1
-  #   environment:
-  #     - ORDERER_GENERAL_LOGLEVEL=DEBUG
-  #     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-  #     - ORDERER_GENERAL_GENESISMETHOD=file
-  #     - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
-  #     - ORDERER_GENERAL_LOCALMSPID=IntelipostMSP
-  #     - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
-  #   working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
-  #   command: orderer
-  #   ports:
-  #     - 7050:7050
-  #   volumes:
-  #       - ./channel-artifacts/:/etc/hyperledger/configtx
-  #       - ./crypto-config/ordererOrganizations/logistic/orderers/intelipost.logistic/:/etc/hyperledger/msp/orderer
-  #   networks:
-  #     - basic
   intelipost.logistic:
     container_name: intelipost.logistic
     restart: always

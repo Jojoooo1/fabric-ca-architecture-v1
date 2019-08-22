@@ -22,13 +22,15 @@ for i in ${!ORGANIZATION_NAME[@]}; do
   ORG_FABRIC_DIR="$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_FULL_NAME"
 
   # Remove TLS in Org MSP
-  rm -rf $ORG_FABRIC_DIR/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
+  rm -rf $ORG_FABRIC_DIR/msp/tlscacerts/*
+  rm -rf $ORG_FABRIC_DIR/msp/tlsintermediatecerts/*
   rm -rf $ORG_FABRIC_DIR/tlsca/*
 
   # Remove TLS for PEERS
   for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
     IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
-    rm -rf $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
+    rm -rf $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/msp/tlscacerts/*
+    rm -rf $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/msp/tlsintermediatecerts/*
     rm -rf $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/tls/*
   done
 
@@ -36,7 +38,8 @@ for i in ${!ORGANIZATION_NAME[@]}; do
   ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
   for j in ${!ORG_IDENTITY}; do
     IDENTITY_NAME=$j
-    rm -rf $ORG_FABRIC_DIR/users/$IDENTITY_NAME/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
+    rm -rf $ORG_FABRIC_DIR/users/$IDENTITY_NAME/msp/tlscacerts/*
+    rm -rf $ORG_FABRIC_DIR/users/$IDENTITY_NAME/msp/tlsintermediatecerts/*
     rm -rf $ORG_FABRIC_DIR/users/$IDENTITY_NAME/tls/*
   done
 

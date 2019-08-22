@@ -112,6 +112,7 @@ createIntermediateCA() {
     echo
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
 
@@ -177,13 +178,15 @@ generateIntermediateCAIdentity() {
     echo
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+
+    ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
     ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity"
 
     #  Replace Org directory & Org name
     sed -i -e "s#DIR_NAME#$ORG_ICA_DIR#" -e "s#ORG_NAME#$ORG_FULL_NAME#" openssl_intermediate.cnf
 
-    # Creates TLS certificates for PEERS (server)
+    # Creates TLS certificates for **PEERS** (server)
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
       IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
       ORG_ICA_IDENTITY_PEERS_DIR="$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME" # Peer name start at 0
@@ -208,11 +211,12 @@ generateIntermediateCAIdentity() {
         -in $ORG_ICA_IDENTITY_PEERS_DIR/server.csr \
         -out $ORG_ICA_IDENTITY_PEERS_DIR/server.crt
 
-      # Copy ICA cert in peer folder
-      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_PEERS_DIR/ca.crt
+      # Copy RCA/ICA cert in PEER_FOLDER
+      cp $ORG_RCA_DIR/certs/tls-rca.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_PEERS_DIR/rca.crt
+      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_PEERS_DIR/ica.crt
     done
 
-    # Creates TLS certificates for USERS (client)
+    # Creates TLS certificates for **USERS** (client)
     ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
     for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
@@ -238,8 +242,9 @@ generateIntermediateCAIdentity() {
         -in $ORG_ICA_IDENTITY_USERS_DIR/client.csr \
         -out $ORG_ICA_IDENTITY_USERS_DIR/client.crt
 
-      # Copy ICA cert in user folder
-      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_USERS_DIR/ca.crt
+      # Copy RCA/ICA cert in USER_FOLDER
+      cp $ORG_RCA_DIR/certs/tls-rca.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_USERS_DIR/rca.crt
+      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_USERS_DIR/ica.crt
     done
 
     # Creates TLS certificates for Fabric CA (server)
@@ -268,10 +273,14 @@ generateIntermediateCAIdentity() {
         -extensions req_ext -days 365 -notext -md sha256 \
         -in $ORG_ICA_IDENTITY_CA_DIR/server.csr \
         -out $ORG_ICA_IDENTITY_CA_DIR/server.crt
+
+      cp $ORG_RCA_DIR/certs/tls-rca.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_CA_DIR/rca.crt
+      cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_CA_DIR/ica.crt
     fi
 
-    # Copy ICA certificate into identity folder
-    cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_DIR/ca.crt
+    # **DONE FOR SIMPLICITY** Copy RCA/ICA certificate into IDENTITY_FOLDER
+    cp $ORG_RCA_DIR/certs/tls-rca.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_DIR/rca.crt
+    cp $ORG_ICA_DIR/certs/tls-ica.$ORG_FULL_NAME.crt.pem $ORG_ICA_IDENTITY_DIR/ica.crt
 
     # Reput default value in config file
     sed -i -e "s#$ORG_ICA_DIR#DIR_NAME#" -e "s#$ORG_FULL_NAME#ORG_NAME#" openssl_intermediate.cnf
@@ -297,8 +306,8 @@ createFabricFolderStructure() {
     # Creates TLS folder for Peers
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
       IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
-      ORG_FABRIC_IDENTITY_PEERS_DIR="$ORG_FABRIC_DIR/peers/$IDENTITY_NAME"                          # Peer name start at 0
-      mkdir -p "$ORG_FABRIC_IDENTITY_PEERS_DIR/msp/tlscacerts" "$ORG_FABRIC_IDENTITY_PEERS_DIR/tls" # Other directory will be created by fabric-ca-client
+      ORG_FABRIC_IDENTITY_PEERS_DIR="$ORG_FABRIC_DIR/peers/$IDENTITY_NAME"                                                                                       # Peer name start at 0
+      mkdir -p "$ORG_FABRIC_IDENTITY_PEERS_DIR/msp/tlscacerts" -p "$ORG_FABRIC_IDENTITY_PEERS_DIR/msp/tlsintermediatecerts" "$ORG_FABRIC_IDENTITY_PEERS_DIR/tls" # Other directory will be created by fabric-ca-client
     done
 
     # Creates TLS folder for Users
@@ -306,12 +315,14 @@ createFabricFolderStructure() {
     for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
       ORG_FABRIC_IDENTITY_USERS_DIR=$ORG_FABRIC_DIR/users/$IDENTITY_NAME
-      mkdir -p "$ORG_FABRIC_IDENTITY_USERS_DIR/msp/tlscacerts" -p "$ORG_FABRIC_IDENTITY_USERS_DIR/tls"
+      mkdir -p "$ORG_FABRIC_IDENTITY_USERS_DIR/msp/tlscacerts" -p "$ORG_FABRIC_IDENTITY_USERS_DIR/msp/tlsintermediatecerts" -p "$ORG_FABRIC_IDENTITY_USERS_DIR/tls"
     done
 
-    # Creates TLS folder for Orgs
-    mkdir -p $ORG_FABRIC_DIR/tlsca
-    mkdir -p $ORG_FABRIC_DIR/msp/tlscacerts # $ORG_FABRIC_DIR/msp/tlsintermediatecerts
+    # Creates TLS folder for TLSCA
+    mkdir -p $ORG_FABRIC_DIR/tlsca # ORG_ICA_IDENTITY_CA_DIR
+
+    # Creates TLSCA for MSP
+    mkdir -p $ORG_FABRIC_DIR/msp/tlscacerts -p $ORG_FABRIC_DIR/msp/tlsintermediatecerts
 
   done
 
@@ -327,32 +338,56 @@ copyFilesToFabricFolder() {
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
 
+    ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity"
+
     ORG_FABRIC_DIR="$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_FULL_NAME"
 
-    # Copy TLS ICA in Org MSP
-    cp $ORG_ICA_IDENTITY_DIR/ca.crt $ORG_FABRIC_DIR/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
+    ######################
+    #####  MSP  ########
+    ######################
+    # Copy TLS_RCA/TLS_ICA in ORG/MSP/TLSCA & ORG/MSP/TLSICA
+    cp $ORG_ICA_IDENTITY_DIR/ica.crt $ORG_FABRIC_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULL_NAME-cert.pem
+    cp $ORG_ICA_IDENTITY_DIR/rca.crt $ORG_FABRIC_DIR/msp/tlscacerts/tls-rca.$ORG_FULL_NAME-cert.pem
 
-    # Copy TLS CA in Org MSP
-    cp $ORG_ICA_IDENTITY_DIR/tlsca/* $ORG_FABRIC_DIR/tlsca/
+    ######################
+    #####  TLSCA  ########
+    ######################
+    # Copy TLSCA certificate in ORG/TLSCA
+    if [ ! -d $TLS_CA ]; then
+      ORG_ICA_IDENTITY_CA_DIR=$ORG_ICA_IDENTITY_DIR/tlsca
+      cp $ORG_ICA_IDENTITY_CA_DIR/* $ORG_FABRIC_DIR/tlsca
+    fi
 
+    ######################
+    #####  PEERS  ########
+    ######################
     # Copy TLS for PEERS
     for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
       IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
-      # Copy ICA certificate
-      cp $ORG_ICA_IDENTITY_DIR/ca.crt $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
-      # Copy PEERS certificate
-      cp $ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME/* $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/tls/
+      ORG_ICA_IDENTITY_PEERS_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME    # Peer name start at 0
+      ORG_FABRIC_IDENTITY_PEERS_DIR=$ORG_FABRIC_DIR/peers/$IDENTITY_NAME # Peer name start at 0
+      # 1. Copy RCA/ICA certificate ORG/PEERS/PEER_MSP
+      cp $ORG_ICA_IDENTITY_DIR/ica.crt $ORG_FABRIC_IDENTITY_PEERS_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULL_NAME-cert.pem
+      cp $ORG_ICA_IDENTITY_DIR/rca.crt $ORG_FABRIC_IDENTITY_PEERS_DIR/msp/tlscacerts/tls-rca.$ORG_FULL_NAME-cert.pem
+      # 2. Copy PEERS certificate in ORG/PEERS/PEER_TLS
+      cp $ORG_ICA_IDENTITY_PEERS_DIR/* $ORG_FABRIC_IDENTITY_PEERS_DIR/tls
     done
 
+    ######################
+    #####  USERS  ########
+    ######################
     # Copy TLS for USERS
     ORG_IDENTITY=ORGANIZATION_USERS_$ORG_NAME[@]
     for j in ${!ORG_IDENTITY}; do
       IDENTITY_NAME=$j
-      # Copy ICA certificate
-      cp $ORG_ICA_IDENTITY_DIR/ca.crt $ORG_FABRIC_DIR/users/$IDENTITY_NAME/msp/tlscacerts/tlsca.$ORG_FULL_NAME-cert.pem
-      # Copy Users certificate
-      cp $ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME/* $ORG_FABRIC_DIR/users/$IDENTITY_NAME/tls
+      ORG_ICA_IDENTITY_USERS_DIR=$ORG_ICA_IDENTITY_DIR/$IDENTITY_NAME    # Peer name start at 0
+      ORG_FABRIC_IDENTITY_USERS_DIR=$ORG_FABRIC_DIR/users/$IDENTITY_NAME # Peer name start at 0
+      # 1. Copy RCA/ICA certificate ORG/USERS/USER_MSP
+      cp $ORG_ICA_IDENTITY_DIR/ica.crt $ORG_FABRIC_IDENTITY_USERS_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULL_NAME-cert.pem
+      cp $ORG_ICA_IDENTITY_DIR/rca.crt $ORG_FABRIC_IDENTITY_USERS_DIR/msp/tlscacerts/tls-rca.$ORG_FULL_NAME-cert.pem
+      # 2. Copy PEERS certificate in ORG/USERS/USER_TLS
+      cp $ORG_ICA_IDENTITY_USERS_DIR/* $ORG_FABRIC_IDENTITY_USERS_DIR/tls
     done
 
   done

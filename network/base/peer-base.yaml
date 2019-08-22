@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-version: '2'
+version: "2"
 
 services:
   peer-base:
@@ -23,7 +23,7 @@ services:
       - CORE_PEER_TLS_ENABLED=$CORE_PEER_TLS_ENABLED
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
-      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/rca.crt
 
       #  Mutual TLS: Verify the certificate of a client (another peer node, application, or the CLI) during a TLS handshake
       #  By default, a peer node will use the **SAME** certificate and private key pair when acting as a TLS SERVER and CLIENT (change it if enabled)

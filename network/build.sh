@@ -30,6 +30,8 @@ function generateCert() {
     exit 1
   fi
 
+  mkdir -p ./crypto-config
+
   # rm -Rf crypto-config
 
   set -x
@@ -50,7 +52,7 @@ function generateChannelArtifacts() {
     exit 1
   fi
 
-  rm -Rf ./channel-artifacts/*
+  mkdir -p ./channel-artifacts
 
   # Create Genesis block defined by profile OrgsOrdererGenesis in configtx.yaml
   set -x
@@ -86,8 +88,8 @@ function generateChannelArtifacts() {
 
 }
 
-# generateCert
-# generateChannelArtifacts
-cryptogen generate --config=./$CRYPTO_CONFIG
-configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block -channelID testchainid
-configtxgen -profile Channel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID mychannel
+generateCert
+generateChannelArtifacts
+# cryptogen generate --config=./$CRYPTO_CONFIG
+# configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block -channelID testchainid
+# configtxgen -profile Channel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID mychannel

@@ -12,5 +12,7 @@ sleep 4
 
 cd ../../network
 ./start-crypto.sh
+./build.sh
+./start.sh
 
 cd $dir

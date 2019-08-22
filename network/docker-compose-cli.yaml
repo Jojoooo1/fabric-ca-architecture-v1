@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 
 networks:
   basic:
@@ -9,7 +9,6 @@ volumes:
 
   # peer0.transporter.logistic:
   # peer1.transporter.logistic:
-
   # peer0.insurance.logistic:
   # peer1.insurance.logistic:
 
@@ -24,8 +23,8 @@ services:
       - COUCHDB_USER=
       - COUCHDB_PASSWORD=
     # volume
-      # "/opt/couchdb/data": {}, vol 3
-      # "/opt/couchdb/etc/local.d": {} vol 1
+    # "/opt/couchdb/data": {}, vol 3
+    # "/opt/couchdb/etc/local.d": {} vol 1
     ports:
       - 5984:5984 # http://localhost:5984/_utils/#/_all_dbs
     networks:
@@ -40,7 +39,7 @@ services:
       - couchdb.peer0.shipper
     networks:
       - basic
-      
+
   # PEER 1
   couchdb.peer1.shipper:
     container_name: couchdb.peer1.shipper
@@ -169,7 +168,7 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/server.key
       # TLSCA
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/ca.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/rca.crt
 
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
@@ -189,7 +188,6 @@ services:
       # - couchdb.peer1.transporter
       # - peer0.transporter.logistic
       # - peer1.transporter.logistic
-
       # - couchdb.peer0.insurance
       # - couchdb.peer1.insurance
       # - peer0.insurance.logistic

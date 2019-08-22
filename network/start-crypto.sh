@@ -16,17 +16,17 @@ ADMIN_DIR=$ORG_DIR/users/Admin@$ORG_FULLNAME
 PEER_DIR=$ORG_DIR/peers/peer0.$ORG_FULLNAME
 PEER_DIR_2=$ORG_DIR/peers/peer1.$ORG_FULLNAME
 
-if [ ! -d $ORG_DIR ] || [ ! -d $REGISTRAR_DIR ] || [ ! -d $ADMIN_DIR ] || [ ! -d $PEER_DIR ]; then
+if [ ! -d $ORG_DIR ] || [ ! -d $REGISTRAR_DIR ] || [ ! -d $ADMIN_DIR ] || [ ! -d $PEER_DIR ] || [ ! -d $PEER_DIR_2 ]; then
   echo "Build failed, Please build ROOT_CA artifacts first"
   exit 1
 fi
 
 docker-compose -f docker-compose-ca.yaml up -d ica.shipper.logistic
 
-sleep 10
+sleep 15 # wait for certificate to be Active
 
 # Fabric CA, by default, backdates the signing of certificates by 5 minutes
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/msp/tlscacerts/tlsca.$ORG_FULLNAME-cert.pem
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULLNAME-cert.pem
 
 echo
 echo "####################################"
@@ -67,7 +67,7 @@ echo "##### Enrolling identity Admin@$ORG_FULLNAME #####"
 echo "##################################################"
 export FABRIC_CA_CLIENT_HOME=$ADMIN_DIR # loads identity $ORG_DIR/users/Admin@$ORG_FULLNAME
 fabric-ca-client enroll \
-  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=org1.$ORG_DOMAIN" \
+  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=$ORG_FULLNAME" \
   -m Admin@$ORG_FULLNAME -u https://Admin@$ORG_FULLNAME:mysecret@localhost:7054
 
 sleep 1
@@ -78,7 +78,7 @@ echo "##### Enrolling identity peer0.$ORG_FULLNAME #####"
 echo "##################################################"
 export FABRIC_CA_CLIENT_HOME=$PEER_DIR # loads identity $ORG_DIR/peers/peer0.$ORG_FULLNAME
 fabric-ca-client enroll \
-  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=org1.$ORG_DOMAIN" \
+  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=$ORG_FULLNAME" \
   -m peer0.$ORG_FULLNAME -u https://peer0.$ORG_FULLNAME:mysecret@localhost:7054
 
 # Copying Admin@$ORG_FULLNAME cert in admincerts folder to follow MSP structure
@@ -86,11 +86,11 @@ cp $ADMIN_DIR/msp/signcerts/*.pem $ADMIN_DIR/msp/admincerts/
 
 export FABRIC_CA_CLIENT_HOME=$PEER_DIR_2 # loads identity $ORG_DIR/peers/peer0.$ORG_FULLNAME
 fabric-ca-client enroll \
-  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=org1.$ORG_DOMAIN" \
+  --csr.names "C=BR,ST=Sao Paulo,L=Sao Paulo,O=$ORG_FULLNAME" \
   -m peer1.$ORG_FULLNAME -u https://peer1.$ORG_FULLNAME:mysecret@localhost:7054
 
 # Copying Admin@$ORG_FULLNAME cert in admincerts folder to follow MSP structure
-cp $ADMIN_DIR/msp/signcerts/*.pem $ADMIN_DIR/msp/admincerts/
+# cp $ADMIN_DIR/msp/signcerts/*.pem $ADMIN_DIR/msp/admincerts/
 
 sleep 1
 
@@ -99,12 +99,14 @@ echo "##################################################################"
 echo "##### Defining Admin@$ORG_FULLNAME as admin of Peer and Orgs #####"
 echo "##################################################################"
 cp $ADMIN_DIR/msp/signcerts/*.pem $PEER_DIR/msp/admincerts/
-cp $ADMIN_DIR/msp/signcerts/*.pem $ORG_DIR/msp/admincerts/
+cp $ADMIN_DIR/msp/signcerts/*.pem $PEER_DIR_2/msp/admincerts/
+
+cp $ADMIN_DIR/msp/signcerts/*.pem $ORG_DIR/msp/admincerts/Admin@$ORG_FULLNAME-cert.pem
 # Copy ca certs & intermediatecerts (taken from dir created by ca) in Org MSP
 cp $PEER_DIR/msp/cacerts/*.pem $ORG_DIR/msp/cacerts/
 cp $PEER_DIR/msp/intermediatecerts/*.pem $ORG_DIR/msp/intermediatecerts/
 # Copy ca certs & intermediatecerts (taken from dir created by ca) in Org MSP
-cp $PEER_DIR_2/msp/cacerts/*.pem $ORG_DIR/msp/cacerts/
-cp $PEER_DIR_2/msp/intermediatecerts/*.pem $ORG_DIR/msp/intermediatecerts/
+# cp $PEER_DIR_2/msp/cacerts/*.pem $ORG_DIR/msp/cacerts/
+# cp $PEER_DIR_2/msp/intermediatecerts/*.pem $ORG_DIR/msp/intermediatecerts/
 
 # ./build.sh && ./start.sh
