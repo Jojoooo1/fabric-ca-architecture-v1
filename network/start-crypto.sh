@@ -21,12 +21,15 @@ if [ ! -d $ORG_DIR ] || [ ! -d $REGISTRAR_DIR ] || [ ! -d $ADMIN_DIR ] || [ ! -d
   exit 1
 fi
 
+cp ./scripts/config.yaml $ORG_DIR/msp
+
 docker-compose -f docker-compose-ca.yaml up -d ica.shipper.logistic
 
-sleep 15 # wait for certificate to be Active
+sleep 15                                                                              # wait for certificate to be Active
 
 # Fabric CA, by default, backdates the signing of certificates by 5 minutes
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULLNAME-cert.pem
+# export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULLNAME-cert.pem
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/tlsca/tls-chain.$ORG_FULLNAME-cert.pem # ica or chain
 
 echo
 echo "####################################"

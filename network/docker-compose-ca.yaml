@@ -28,7 +28,7 @@ services:
   # tls.ica.shipper.logistic:
   #   container_name: tls.ica.shipper.logistic
   #   image: hyperledger/fabric-ca
-  #   command: sh -c 'fabric-ca-server start -b tlsca-admin:tlsca-adminpw'
+  #   command: sh -c 'fabric-ca-server start -b tlsadmin:tlsadminpw'
   #   environment:
   #     - FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server
   #     - FABRIC_CA_SERVER_CA_NAME=tls.ica.shipper.logistic

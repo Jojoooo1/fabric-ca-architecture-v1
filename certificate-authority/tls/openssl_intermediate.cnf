@@ -20,7 +20,7 @@ crlnumber         = $dir/crlnumber # Text file containing the next CRL number to
 # The root key and root certificate.
 RANDFILE          = $dir/private/.rand # private random number file
 private_key       = $dir/private/tls-ica.ORG_NAME.key.pem # the file contaning the CA private key
-certificate       = $dir/certs/tls-ica.ORG_NAME.crt.pem # the file containing the CA certificate
+certificate       = $dir/certs/tls-ica.ORG_NAME-cert.pem # the file containing the CA certificate
 
 # For certificate revocation lists.
 crl               = $dir/crl/tls-ica.ORG_NAME.crl.pem # The current CRL

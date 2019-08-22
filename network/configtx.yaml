@@ -217,14 +217,14 @@ Profiles:
         <<: *ApplicationCapabilities
 
 ---
-################################################################################
-#
-#   ORGANIZATIONS
-#
-#   This section defines the organizational identities that can be referenced
-#   in the configuration profiles.
-#
-################################################################################
+# ################################################################################
+# #
+# #   ORGANIZATIONS
+# #
+# #   This section defines the organizational identities that can be referenced
+# #   in the configuration profiles.
+# #
+# ################################################################################
 # Organizations:
 
 #     - &OrdererOrg

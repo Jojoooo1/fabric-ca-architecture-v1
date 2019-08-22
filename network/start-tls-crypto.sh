@@ -10,7 +10,7 @@ ORG_NAME=shipper
 
 ORG_DIR=$PWD/crypto-config/peerOrganizations/$ORG_NAME.$ORG_DOMAIN
 
-REGISTRAR_DIR=$ORG_DIR/users/tlsca-admin # default identity used at fabric-ca-server instantiation # Will register the others identities
+REGISTRAR_DIR=$ORG_DIR/users/tlsadmin # default identity used at fabric-ca-server instantiation # Will register the others identities
 ADMIN_DIR=$ORG_DIR/users/Admin@$ORG_NAME.$ORG_DOMAIN
 PEER_DIR=$ORG_DIR/peers/peer0.$ORG_NAME.$ORG_DOMAIN
 
@@ -28,9 +28,9 @@ sleep 15 # wait for certificate to be Active
 
 # No trusted root certificates for TLS were provided
 # export FABRIC_CA_CLIENT_TLS_CERTFILES=/home/jonathan/Bureau/Hyperledger-node/Projects/0.base/ca-production/network/crypto-config/peerOrganizations/shipper.logistic/tlsca/tls-ica.shipper.logistic.crt.pem
-# export FABRIC_CA_CLIENT_HOME=/home/jonathan/Bureau/Hyperledger-node/Projects/0.base/ca-production/network/crypto-config/peerOrganizations/shipper.logistic/users/tlsca-admin
+# export FABRIC_CA_CLIENT_HOME=/home/jonathan/Bureau/Hyperledger-node/Projects/0.base/ca-production/network/crypto-config/peerOrganizations/shipper.logistic/users/tlsadmin
 
-# fabric-ca-client enroll -d -m tlsca-admin -u https://tlsca-admin:tlsca-adminpw@localhost:8054
+# fabric-ca-client enroll -d -m tlsadmin -u https://tlsadmin:tlsadminpw@localhost:8054
 # sleep 2
 # fabric-ca-client register -d --id.name peer0.$ORG_NAME.$ORG_DOMAIN --id.secret mysecret --id.type peer -u https://localhost:8054
 

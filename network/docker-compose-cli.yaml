@@ -168,7 +168,7 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/server.key
       # TLSCA
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/rca.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shipper.logistic/peers/peer0.shipper.logistic/tls/ca.crt
 
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
