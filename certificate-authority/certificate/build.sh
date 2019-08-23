@@ -201,9 +201,9 @@ copyFilesToFabricCryptoConfig() {
     # Fabric DIR
     ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
 
-    # Copy all ca file to FABRIC ca folder
+    # Copy using default format in order to allow multiple orgs
     mkdir -p $ORG_FABRIC_DIR/ca
-    cp $ORG_ICA_DIR/* $ORG_FABRIC_DIR/ca/
+    cp $ORG_ICA_DIR/* $ORG_FABRIC_DIR/ca
 
     # Copy RCA/ICA to MSP folder
     cp $ORG_RCA_DIR/certs/${CA_PREFIX}rca.$ORG_FULL_NAME-cert.pem $ORG_FABRIC_DIR/msp/cacerts/

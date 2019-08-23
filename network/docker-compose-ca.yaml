@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-version: '2'
+version: "2"
 
 networks:
   basic:
@@ -16,36 +16,27 @@ services:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       # **CONFIG** because of **BACKDATE** Sets in fabric-ca-server-config.yaml
     ports:
-      - '7054:7054'
+      - "7054:7054"
     command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/shipper.logistic/ca/:/etc/hyperledger/fabric-ca-server-config # Copy MSP and call it from ENVIRONMENT
       - ./crypto-config/peerOrganizations/shipper.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config-tls # Copy MSP and call it from ENVIRONMENT
-      - ./ca-config/:/etc/hyperledger/fabric-ca-server # Copy fabric-ca-server-config in fabric-ca-server
+      - ./ca-config/fabric-ca-server-shipper-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml # Copy fabric-ca-server-config in fabric-ca-server
     networks:
       - basic
 
-  # tls.ica.shipper.logistic:
-  #   container_name: tls.ica.shipper.logistic
-  #   image: hyperledger/fabric-ca
-  #   command: sh -c 'fabric-ca-server start -b tlsadmin:tlsadminpw'
-  #   environment:
-  #     - FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server
-  #     - FABRIC_CA_SERVER_CA_NAME=tls.ica.shipper.logistic
-
-  #     - FABRIC_CA_SERVER_TLS_ENABLED=true
-  #     # - FABRIC_CA_CLIENT_TLS_CERTFILES=/etc/hyperledger/fabric-ca-server-config/tls-chain.shipper.logistic.crt.pem
-  #     # - FABRIC_CA_CLIENT_TLS_CERTFILES=/etc/hyperledger/fabric-ca-server-config/tls-ica.shipper.logistic.crt.pem
-
-  #     - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/tls-ica.shipper.logistic.crt.pem
-  #     - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/tls-ica.shipper.logistic.key.pem
-
-  #     - FABRIC_CA_SERVER_CSR_CN=tls.ica.shipper.logistic
-  #     - FABRIC_CA_SERVER_CSR_HOSTS=tls.ica.shipper.logistic,localhost
-  #   volumes:
-  #     - ./crypto-config/peerOrganizations/shipper.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config
-  #     # -  ./ca-config-tls/:/etc/hyperledger/fabric-ca-server # Copy fabric-ca-server-config in fabric-ca-server
-  #   networks:
-  #     - basic
-  #   ports:
-  #     - 8054:7054
+  ica.transporter.logistic:
+    container_name: ica.transporter.logistic
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      # **CONFIG** because of **BACKDATE** Sets in fabric-ca-server-config.yaml
+    ports:
+      - "8054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
+    volumes:
+      - ./crypto-config/peerOrganizations/transporter.logistic/ca/:/etc/hyperledger/fabric-ca-server-config # Copy MSP and call it from ENVIRONMENT
+      - ./crypto-config/peerOrganizations/transporter.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config-tls # Copy MSP and call it from ENVIRONMENT
+      - ./ca-config/fabric-ca-server-transporter-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml # Copy fabric-ca-server-config in fabric-ca-server
+    networks:
+      - basic

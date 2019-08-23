@@ -8,15 +8,17 @@ export CA_TLS_ENABLED=true
 
 DOMAIN=logistic
 ORGANIZATION_DOMAIN="logistic"
-ORGANIZATION_NAME=("shipper")
-ORGANIZATION_TYPE=("peer")
-ORGANIZATION_PEER_NUMBER=(2)
+# ORGANIZATION_NAME=("shipper")
+ORGANIZATION_NAME=("shipper" "transporter")
+ORGANIZATION_TYPE=("peer" "peer")
+ORGANIZATION_PEER_NUMBER=(2 2)
 
-ORGANIZATION_CA_URL=("localhost:7054")
+ORGANIZATION_CA_URL=("localhost:7054" "localhost:8054")
 # Defined organization identity here individually
 # CA admin is assigned by default to "admin"
 # Admin@ORG_FULL_NAME is assigned by default to msp/admincerts
 ORGANIZATION_USERS_shipper=("Admin@shipper.logistic")
+ORGANIZATION_USERS_transporter=("Admin@transporter.logistic")
 
 # Folders
 CONFIG_FOLDER=$PWD/crypto-config
@@ -26,15 +28,17 @@ if [ ! "$(ls -A $CONFIG_FOLDER)" ]; then
   exit 1
 fi
 
-docker-compose -f docker-compose-ca.yaml up -d ica.shipper.logistic
+docker-compose -f docker-compose-ca.yaml up -d
 
-sleep 15 # need to wait tls backdated certificate
+sleep 25 # need to wait tls backdated certificate # Failed to verify certificate: x509: certificate has expired or is not yet valid
 
 # Enroll boostrapped user
 enrollBoostrappedAdmin() {
+  echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-
     ORG_NAME=${ORGANIZATION_NAME[$i]}
+    echo "Enrolling bootstrapped admin for $ORG_NAME..."
+
     ORG_FULL_NAME=$ORG_NAME.$ORGANIZATION_DOMAIN
     ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
     # boostrapped admin folder
@@ -55,19 +59,23 @@ enrollBoostrappedAdmin() {
     # [INFO] Stored Issuer public key at users/admin/msp/IssuerPublicKey
     # [INFO] Stored Issuer revocation public key at users/admin/msp/IssuerRevocationPublicKey
   done
-
+  echo "******************************"
 }
 
 registerIdentity() {
+  echo "******************************"
   # Sets identity as CA admin for registering identity
-  export FABRIC_CA_CLIENT_HOME=$REGISTRAR_DIR
-
   for i in ${!ORGANIZATION_NAME[@]}; do
-
     ORG_NAME=${ORGANIZATION_NAME[$i]}
+    echo "Registering organization identity for $ORG_NAME..."
+
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
+    # boostrapped admin folder
+    REGISTRAR_DIR=$ORG_DIR/users/admin
 
+    # Sets identity as CA admin
+    export FABRIC_CA_CLIENT_HOME=$REGISTRAR_DIR
     # Sets TLS certificate to communicate with fabric-ca
     export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/tlsca/tls-chain.$ORG_FULL_NAME-cert.pem
 
@@ -83,13 +91,17 @@ registerIdentity() {
       fabric-ca-client register --id.name $IDENTITY_NAME --id.secret mysecret --id.type client -u https://${ORGANIZATION_CA_URL[$i]} # Identity performing the register command sets by **FABRIC_CA_CLIENT_HOME**
       # [INFO] Configuration file location: shipper.logistic/users/admin/fabric-ca-client-config.yaml
     done
+
   done
+  echo "******************************"
 }
 
 enrollIdentity() {
+  echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-
     ORG_NAME=${ORGANIZATION_NAME[$i]}
+    echo "Enrolling organization identity for $ORG_NAME..."
+
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
 
@@ -120,12 +132,15 @@ enrollIdentity() {
     done
 
   done
+  echo "******************************"
 }
 
 copyAdminIdentityToAllMSPIdentity() {
+  echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
-
     ORG_NAME=${ORGANIZATION_NAME[$i]}
+    echo "Copying admin certificate to MSP folder for $ORG_NAME..."
+
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
 
@@ -152,11 +167,12 @@ copyAdminIdentityToAllMSPIdentity() {
     done
 
   done
+  echo "******************************"
 }
 
 enrollBoostrappedAdmin
 
-sleep 20 # need to wait identity backdated certificate
+sleep 30 # need to wait identity backdated certificate # Failed to verify certificate: x509: certificate has expired or is not yet valid
 
 registerIdentity
 enrollIdentity

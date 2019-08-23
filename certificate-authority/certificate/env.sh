@@ -1,9 +1,12 @@
 # Organisations variables
 DOMAIN=logistic
-ORGANIZATION_NAME=(shipper)
-ORGANIZATION_PEER_NUMBER=(2)
 
-ORGANIZATION_USERS_shipper=(admin Admin@$ORGANIZATION_NAME.$DOMAIN)
+ORGANIZATION_NAME=("shipper" "transporter" "insurance")
+ORGANIZATION_PEER_NUMBER=(2 2 2)
+
+ORGANIZATION_USERS_shipper=(admin "Admin@shipper.$DOMAIN")
+ORGANIZATION_USERS_transporter=(admin "Admin@transporter.$DOMAIN")
+ORGANIZATION_USERS_insurance=(admin "Admin@insurance.$DOMAIN")
 
 CA_PREFIX=''
 

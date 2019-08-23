@@ -249,7 +249,7 @@ generateIntermediateCAIdentityTLS() {
         -config openssl_intermediate.cnf \
         -key $ORG_ICA_IDENTITY_IDENTITY_TLS_DIR/client.key \
         -out $ORG_ICA_IDENTITY_IDENTITY_TLS_DIR/client.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$ORG_FULL_NAME"
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME" # already contain domain in name
 
       # ICA sign CSR
       openssl ca -batch \
@@ -281,7 +281,7 @@ generateIntermediateCAIdentityTLS() {
         -config openssl_intermediate.cnf \
         -key $ORG_ICA_IDENTITY_CA_DIR/server.key \
         -out $ORG_ICA_IDENTITY_CA_DIR/server.csr \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.shipper.logistic" # x509: certificate is not valid for any names, but wanted to match localhost
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=$ORG_FULL_NAME/OU=/CN=$IDENTITY_NAME.$ORG_FULL_NAME" # x509: certificate is not valid for any names, but wanted to match localhost
       # /CN=$IDENTITY_NAME.$ORG_FULL_NAME
 
       # ICA sign CSR

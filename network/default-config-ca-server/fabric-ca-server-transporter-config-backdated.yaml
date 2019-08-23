@@ -86,13 +86,13 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: ica.shipper.logistic # ADDED NAME MANDATORY
+  name: ica.transporter.logistic # ADDED NAME MANDATORY
   # Key file (is only used to import a private key into BCCSP)
-  keyfile: /etc/hyperledger/fabric-ca-server-config/ica.shipper.logistic.key.pem
+  keyfile: /etc/hyperledger/fabric-ca-server-config/ica.key.pem
   # Certificate file (default: ca-cert.pem)
-  certfile: /etc/hyperledger/fabric-ca-server-config/ica.shipper.logistic-cert.pem
+  certfile: /etc/hyperledger/fabric-ca-server-config/ica-cert.pem
   # Chain file
-  chainfile: /etc/hyperledger/fabric-ca-server-config/chain.shipper.logistic-cert.pem
+  chainfile: /etc/hyperledger/fabric-ca-server-config/chain-cert.pem
 
 #############################################################################
 #  The gencrl REST endpoint is used to generate a CRL that contains revoked

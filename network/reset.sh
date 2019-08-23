@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+. ./scripts/env_var.sh
+
 DIR=$PWD
 CLEAN_ALL=$1 # Args used for cleaning all crypto related files
 
@@ -18,13 +20,11 @@ sudo rm -rf $DIR/channel-artifacts/*
 
 # Resets ca-config
 sudo rm -rf $DIR/ca-config/*
+
 # Copy default config with backdate argument
-#  cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
-cp $DIR/fabric-ca-server-default-config-backdated.yaml $DIR/ca-config/fabric-ca-server-config.yaml # Same name or will create errors
-# if set specific ca-server-config
-# cd $DIR/ca-server-config
-# sudo rm -rf $(ls | grep -v fabric-ca-server-config*)
-# cd $DIR
+for i in ${!ORGANIZATION_NAME[@]}; do
+  cp $DIR/default-config-ca-server/fabric-ca-server-${ORGANIZATION_NAME[$i],,}-config-backdated.yaml $DIR/ca-config/fabric-ca-server-${ORGANIZATION_NAME[$i],,}-config.yaml # Same name or will create errors
+done
 
 # Remove all volumes
 docker volume prune
