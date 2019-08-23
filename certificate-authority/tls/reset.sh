@@ -12,7 +12,6 @@ rm -rf root-ca/*
 rm -rf intermediate-ca/*
 
 rm -rf ./openssl_*
-cp -r ./config/* ./
 
 echo "ROOT & INTERMEDIATE TLS certificates were removed successfully"
 

@@ -29,7 +29,7 @@ sleep 15                                                                        
 
 # Fabric CA, by default, backdates the signing of certificates by 5 minutes
 # export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/msp/tlsintermediatecerts/tls-ica.$ORG_FULLNAME-cert.pem
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/tlsca/tls-chain.$ORG_FULLNAME-cert.pem # ica or chain
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/tlsca/tls-chain.$ORG_FULLNAME-cert.pem # chain
 
 echo
 echo "####################################"

@@ -7,6 +7,7 @@ set -e
 # Remove ROOT_CA_CONFIG
 rm -rf root-ca/*
 rm -rf intermediate-ca/*
+rm -rf ./openssl_*
 
 echo "ROOT & INTERMEDIATE certificates were removed successfully"
 
