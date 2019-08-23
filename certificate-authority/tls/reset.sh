@@ -11,6 +11,9 @@ FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
 rm -rf root-ca/*
 rm -rf intermediate-ca/*
 
+rm -rf ./openssl_*
+cp -r ./config/* ./
+
 echo "ROOT & INTERMEDIATE TLS certificates were removed successfully"
 
 # Remove FABRIC_CA_TLS

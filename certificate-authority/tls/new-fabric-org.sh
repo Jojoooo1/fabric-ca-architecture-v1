@@ -1,15 +1,33 @@
 #!/bin/bash
 set -e
 
-# import variable
-. ./env.sh
+# Organisations variables
+DOMAIN=logistic
+ORGANIZATION_NAME=("teszeteeee")
+ORGANIZATION_TYPE=("peer")
+ORGANIZATION_PEER_NUMBER=(2)
+
+ORGANIZATION_USERS_shipper=(admin Admin@$ORGANIZATION_NAME.$DOMAIN)
+
+TLS_CA=true
+
+# Directories variables
+ROOT_CA_DIR=$PWD
+FABRIC_CA_DIR=$ROOT_CA_DIR/../../network # Fabric CA is created as intermediate CA
+
+# Config
+rm -rf ./openssl_*
+cp -r ./config/* ./
 
 if [ ! -d $FABRIC_CA_DIR ]; then
   echo "Build failed, Fabric network directory not found"
   exit 1
 fi
 
-./reset.sh
+if [ ! "$(ls -A $PWD/root-ca)" ] || [ ! "$(ls -A $PWD/intermediate-ca)" ]; then
+  echo "Build failed, please create a root and intermediate CA first"
+  exit 1
+fi
 
 ########################
 ### Creating ROOT_CA ###
@@ -315,13 +333,16 @@ copyFilesToFabricFolder() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
+    ORG_TYPE=${ORGANIZATION_TYPE[$i]}
+
     echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_IDENTITY_DIR="intermediate-ca/ica-$ORG_NAME-identity/$ORG_FULL_NAME"
 
-    cp -n -r $ORG_ICA_IDENTITY_DIR "$FABRIC_CA_DIR/crypto-config/peerOrganizations/"
+    cp -n -r $ORG_ICA_IDENTITY_DIR "$FABRIC_CA_DIR/crypto-config/${ORG_TYPE}Organizations/"
+
   done
   echo "******************************"
   echo
