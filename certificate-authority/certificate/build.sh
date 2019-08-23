@@ -162,6 +162,8 @@ createFabricAdminCertFolder() {
     # CA & MSP
     mkdir -p $ORG_FABRIC_DIR/ca $ORG_FABRIC_DIR/msp/admincerts $ORG_FABRIC_DIR/msp/cacerts $ORG_FABRIC_DIR/msp/intermediatecerts # Peers intermediatecerts will be automatically created
 
+    # Copy MSP OU identifier config
+    cp ./config/config.yaml $ORG_FABRIC_DIR/msp/
   done
   echo "******************************"
   echo
@@ -193,11 +195,19 @@ copyFilesToFabricCryptoConfig() {
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
 
+    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
+    ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
+    # Fabric DIR
     ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
 
-    mkdir -p $ORG_FABRIC_DIR/ca/
+    # Copy all ca file to FABRIC ca folder
+    mkdir -p $ORG_FABRIC_DIR/ca
     cp $ORG_ICA_DIR/* $ORG_FABRIC_DIR/ca/
+
+    # Copy RCA/ICA to MSP folder
+    cp $ORG_RCA_DIR/certs/${CA_PREFIX}rca.$ORG_FULL_NAME-cert.pem $ORG_FABRIC_DIR/msp/cacerts/
+    cp $ORG_ICA_DIR/${CA_PREFIX}ica.$ORG_FULL_NAME-cert.pem $ORG_FABRIC_DIR/msp/intermediatecerts/
   done
   echo "******************************"
   echo

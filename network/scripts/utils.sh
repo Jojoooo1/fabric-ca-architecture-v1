@@ -18,23 +18,6 @@ setVariables() {
   # set +x
 }
 
-# replaceCAPrivateKey() {
-#   SET=$1
-#   # Set PrivateKey
-#   if [ $SET -eq 1 ]; then
-#     for i in ${!ORGANIZATION_DOMAIN[@]}; do # @ get all value of the array ${} exec the value ! represent the index
-#       PRIV_KEY=$(ls crypto-config/peerOrganizations/${ORGANIZATION_DOMAIN[$i]}/ca/*_sk | xargs -n1 basename)
-#       sed -i "s/CA${i}_PRIVATE_KEY/${PRIV_KEY}/g" $COMPOSE_FILE
-#     done
-#   # Set default variable
-#   else
-#     for i in ${!ORGANIZATION_DOMAIN[@]}; do
-#       PRIV_KEY=$(ls crypto-config/peerOrganizations/${ORGANIZATION_DOMAIN[$i]}/ca/*_sk | xargs -n1 basename)
-#       sed -i "s/${PRIV_KEY}/CA${i}_PRIVATE_KEY/g" $COMPOSE_FILE
-#     done
-#   fi
-# }
-
 # loadCAPrivateKey() {
 #   for i in ${!ORGANIZATION_DOMAIN[@]}; do # @ get all value of the array ${} exec the value ! represent the index
 #     export CA${i}_PRIVATE_KEY=$(ls crypto-config/peerOrganizations/${ORGANIZATION_DOMAIN[$i]}/ca/*_sk | xargs -n1 basename)
