@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ev
+set -e
 
 # import var & utils lib
 . ./scripts/env_var.sh
@@ -25,7 +25,7 @@ joinPeersTochannel
 sleep 2
 
 # 2.2 Set anchor peers
-# setAnchorPeers
+setAnchorPeers
 sleep 2
 
 # 3. Install chaincode to every peers

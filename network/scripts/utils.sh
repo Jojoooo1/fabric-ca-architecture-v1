@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # $1 organization index | $2 peer number
 setVariables() {
   # set -x
@@ -145,11 +147,11 @@ startChaincodeContainer() {
     for i in ${!ORGANIZATIONS[@]}; do #  Loop every organization
 
       ORGANIZATION_START_INDEX=$(($i + 1))
+      PEER_N=${PEER_NUMBER[$i]}
+      echo $PEER_N # Need to put it in number, was creating problem
 
-      for ((j = 0; j < ${PEER_NUMBER[$i]}; j++)); do # loop every peer
-        echo "TEEEEEEEEEEEST"
-        echo $ORGANIZATION_START_INDEX $j
-        echo "TEEEEEEEEEEEST"
+      for ((j = 0; j < $(($PEER_N)); j++)); do # loop every peer
+
         setVariables $ORGANIZATION_START_INDEX $j
         docker exec -it \
           -e "CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH" \

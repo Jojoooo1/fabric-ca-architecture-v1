@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export COMPOSE_PROJECT_NAME=net
 export IMAGE_TAG=latest
 export CORE_PEER_TLS_ENABLED=true
