@@ -147,6 +147,9 @@ startChaincodeContainer() {
       ORGANIZATION_START_INDEX=$(($i + 1))
 
       for ((j = 0; j < ${PEER_NUMBER[$i]}; j++)); do # loop every peer
+        echo "TEEEEEEEEEEEST"
+        echo $ORGANIZATION_START_INDEX $j
+        echo "TEEEEEEEEEEEST"
         setVariables $ORGANIZATION_START_INDEX $j
         docker exec -it \
           -e "CORE_PEER_MSPCONFIGPATH=$CORE_PEER_MSPCONFIGPATH" \

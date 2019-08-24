@@ -9,16 +9,17 @@ export CA_TLS_ENABLED=true
 DOMAIN=logistic
 ORGANIZATION_DOMAIN="logistic"
 # ORGANIZATION_NAME=("shipper")
-ORGANIZATION_NAME=("shipper" "transporter")
-ORGANIZATION_TYPE=("peer" "peer")
-ORGANIZATION_PEER_NUMBER=(2 2)
+ORGANIZATION_NAME=("shipper" "transporter" "insurance")
+ORGANIZATION_TYPE=("peer" "peer" "peer")
+ORGANIZATION_PEER_NUMBER=(2 2 2)
 
-ORGANIZATION_CA_URL=("localhost:7054" "localhost:8054")
+ORGANIZATION_CA_URL=("localhost:7054" "localhost:8054" "localhost:9054")
 # Defined organization identity here individually
 # CA admin is assigned by default to "admin"
 # Admin@ORG_FULL_NAME is assigned by default to msp/admincerts
 ORGANIZATION_USERS_shipper=("Admin@shipper.logistic")
 ORGANIZATION_USERS_transporter=("Admin@transporter.logistic")
+ORGANIZATION_USERS_insurance=("Admin@insurance.logistic")
 
 # Folders
 CONFIG_FOLDER=$PWD/crypto-config

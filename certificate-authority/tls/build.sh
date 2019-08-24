@@ -21,7 +21,7 @@ createRootCAStructure() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating ROOT_CA artifacts for $ORG_NAME"
+    echo "Creating ROOT_CA artifacts for $ORG_NAME..."
 
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
 
@@ -46,7 +46,7 @@ createRootCA() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating ROOT_CA private key and CSR for $ORG_NAME"
+    echo "Creating ROOT_CA private key and CSR for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
@@ -84,7 +84,7 @@ createIntermediateCAStructure() {
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo
-    echo "Creating INTERMEDIATE_CA artifacts for $ORG_NAME"
+    echo "Creating INTERMEDIATE_CA artifacts for $ORG_NAME..."
     echo
 
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
@@ -112,7 +112,7 @@ createIntermediateCA() {
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo
-    echo "Creating INTERMEDIATE_CA private key and CSR for $ORG_NAME"
+    echo "Creating INTERMEDIATE_CA private key and CSR for $ORG_NAME..."
     echo
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
@@ -157,7 +157,7 @@ createIntermediateCAChain() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating FABRIC_CA chainfile certificate for $ORG_NAME"
+    echo "Creating FABRIC_CA chainfile certificate for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
@@ -178,7 +178,7 @@ generateIntermediateCAIdentityTLS() {
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo
-    echo "Creating FABRIC_IDENTITY private key and CSR for $ORG_NAME"
+    echo "Creating FABRIC_IDENTITY private key and CSR for $ORG_NAME..."
     echo
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
@@ -319,7 +319,7 @@ copyFilesToFabricFolder() {
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     ORG_TYPE=${ORGANIZATION_TYPE[$i]}
 
-    echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
+    echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"

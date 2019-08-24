@@ -1,8 +1,8 @@
 NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: intermediatecacerts/localhost-7054.pem
+    Certificate: intermediatecacerts/ORG_ICA_CERT_NAME
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: intermediatecacerts/localhost-7054.pem
+    Certificate: intermediatecacerts/ORG_ICA_CERT_NAME
     OrganizationalUnitIdentifier: peer

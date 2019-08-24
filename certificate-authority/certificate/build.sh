@@ -21,7 +21,7 @@ createRootCAStructure() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating ROOT_CA artifacts for $ORG_NAME"
+    echo "Creating ROOT_CA artifacts for $ORG_NAME..."
 
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
 
@@ -46,7 +46,7 @@ createRootCA() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating ROOT_CA private key and CSR for $ORG_NAME"
+    echo "Creating ROOT_CA private key and CSR for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
@@ -83,7 +83,7 @@ createIntermediateCA() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating INTERMEDIATE_CA private key and CSR for $ORG_NAME"
+    echo "Creating INTERMEDIATE_CA private key and CSR for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
 
@@ -139,7 +139,7 @@ createFabricAdminCertFolder() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating Fabric network crypto-config folder structure for $ORG_NAME"
+    echo "Creating Fabric network crypto-config folder structure for $ORG_NAME..."
 
     # Creates admincerts for copying signed cert created
 
@@ -164,6 +164,8 @@ createFabricAdminCertFolder() {
 
     # Copy MSP OU identifier config
     cp ./config/config.yaml $ORG_FABRIC_DIR/msp/
+    ORG_ICA_CERT_NAME=ica.$ORG_FULL_NAME-cert.pem
+    sed -i -e "s#ORG_ICA_CERT_NAME#$ORG_ICA_CERT_NAME#" $ORG_FABRIC_DIR/msp/config.yaml
   done
   echo "******************************"
   echo
@@ -173,7 +175,7 @@ createIntermediateCAChain() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Creating FABRIC_CA chainfile certificate for $ORG_NAME"
+    echo "Creating FABRIC_CA chainfile certificate for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
@@ -193,17 +195,19 @@ copyFilesToFabricCryptoConfig() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
-    echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME"
+    echo "Copying FABRIC_CA Certificate to network folder for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$DOMAIN
     ORG_RCA_DIR="root-ca/rca-$ORG_NAME"
     ORG_ICA_DIR="intermediate-ca/ica-$ORG_NAME"
     # Fabric DIR
-    ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_NAME.$DOMAIN
+    ORG_FABRIC_DIR=$FABRIC_CA_DIR/crypto-config/peerOrganizations/$ORG_FULL_NAME
 
     # Copy using default format in order to allow multiple orgs
     mkdir -p $ORG_FABRIC_DIR/ca
-    cp $ORG_ICA_DIR/* $ORG_FABRIC_DIR/ca
+    cp $ORG_ICA_DIR/ica.$ORG_FULL_NAME-cert.pem $ORG_FABRIC_DIR/ca/ica-cert.pem
+    cp $ORG_ICA_DIR/ica.$ORG_FULL_NAME.key.pem $ORG_FABRIC_DIR/ca/ica.key.pem
+    cp $ORG_ICA_DIR/chain.$ORG_FULL_NAME-cert.pem $ORG_FABRIC_DIR/ca/chain-cert.pem
 
     # Copy RCA/ICA to MSP folder
     cp $ORG_RCA_DIR/certs/${CA_PREFIX}rca.$ORG_FULL_NAME-cert.pem $ORG_FABRIC_DIR/msp/cacerts/

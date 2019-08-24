@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-. ./scripts/env_var.sh
+# Used only to clean crypto-config
+ORGANIZATION_NAME=("shipper" "transporter" "insurance")
 
 DIR=$PWD
 CLEAN_ALL=$1 # Args used for cleaning all crypto related files
@@ -23,7 +24,10 @@ sudo rm -rf $DIR/ca-config/*
 
 # Copy default config with backdate argument
 for i in ${!ORGANIZATION_NAME[@]}; do
-  cp $DIR/default-config-ca-server/fabric-ca-server-${ORGANIZATION_NAME[$i],,}-config-backdated.yaml $DIR/ca-config/fabric-ca-server-${ORGANIZATION_NAME[$i],,}-config.yaml # Same name or will create errors
+  CONFIG_FOLDER=$DIR/ca-config/fabric-ca-server-${ORGANIZATION_NAME[$i],,}
+  # Mandatory specific folder to overwrite config
+  mkdir -p $CONFIG_FOLDER
+  cp $DIR/default-config-ca-server/fabric-ca-server-${ORGANIZATION_NAME[$i],,}-config-backdated.yaml $CONFIG_FOLDER/fabric-ca-server-config.yaml # Same name or will create errors
 done
 
 # Remove all volumes
