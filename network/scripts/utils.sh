@@ -148,9 +148,8 @@ startChaincodeContainer() {
 
       ORGANIZATION_START_INDEX=$(($i + 1))
       PEER_N=${PEER_NUMBER[$i]}
-      echo $PEER_N # Need to put it in number, was creating problem
 
-      for ((j = 0; j < $(($PEER_N)); j++)); do # loop every peer
+      for ((j = 0; j < $(($PEER_N)); j++)); do # Need to put it in number, was creating problem
 
         setVariables $ORGANIZATION_START_INDEX $j
         docker exec -it \
