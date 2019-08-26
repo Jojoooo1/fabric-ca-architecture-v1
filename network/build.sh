@@ -30,7 +30,7 @@ generateCert() {
     exit 1
   fi
 
-  mkdir -p $dir/crypto-config
+  mkdir -p "$dir/crypto-config"
 
   # rm -Rf crypto-config
 
@@ -58,9 +58,12 @@ generateCertFromOpenSSL() {
   cd $PKI_CERTIFICATE_PATH && ./build.sh
   cd $PKI_TLS_PATH && ./build.sh
 
-  cd $dir
+}
 
-  sleep 3
+createAdminMSP() {
+  cd $dir
+  ./pki-start.sh
+  cd $dir
 }
 
 # 2. Create Genesis block with initial consortium definition and anchorPeers
@@ -119,10 +122,9 @@ if [ $RESET_PKI == "reset" ]; then
 fi
 
 generateCert
-# generateCertFromOpenSSL
+generateCertFromOpenSSL
+createAdminMSP
 generateChannelArtifacts
 generateAnchorPeerConfiguration
 
-# cryptogen generate --config=./$CRYPTO_CONFIG
-# configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block -channelID testchainid
-# configtxgen -profile Channel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID mychannel
+# ERRORS MESSAGE = panic: proto: Marshal called with nil ==> Some folder in MSP are empty

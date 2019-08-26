@@ -27,11 +27,11 @@ CHAINCODE_POLICY=('"OR ('"'"'ShipperMSP.peer'"'"','"'"'TransporterMSP.peer'"'"')
 
 # Organization definition
 ORGANIZATION_DOMAIN=logistic
-ORGANIZATION_NAME=("shipper" "transporter")
-ORGANIZATION_MSPID=("ShipperMSP" "TransporterMSP")
+ORGANIZATION_NAME=("shipper" "transporter" "insurance")
+ORGANIZATION_MSPID=("ShipperMSP" "TransporterMSP" "InsuranceMSP")
 
-ORGANIZATION_PEER_NUMBER=(1 1)              # Template count in crypto-config && modify docker-compose
-ORGANIZATION_PEER_STARTING_PORT=(7051 9051) # PORT START NUMBER if two peers 7051, 8051 next orgs start at 9051
+ORGANIZATION_PEER_NUMBER=(2 2 2)                  # Template count in crypto-config && modify docker-compose
+ORGANIZATION_PEER_STARTING_PORT=(7051 9051 11051) # PORT START NUMBER if two peers 7051, 8051 next orgs start at 9051
 
 # Orderer definition
 ORDERER_NAME=intelipost

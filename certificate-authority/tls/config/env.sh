@@ -4,7 +4,7 @@ DOMAIN=logistic
 ORGANIZATION_NAME=("shipper" "transporter" "insurance")
 
 ORGANIZATION_PEER_NUMBER=(2 2 2)
-ORGANIZATION_ORDERER_NUMBER=(1 0 0)
+ORGANIZATION_ORDERER_NUMBER=(0 0 0)
 
 ORGANIZATION_USERS_shipper=("admin" "Admin@shipper.$DOMAIN")
 ORGANIZATION_USERS_transporter=("admin" "Admin@transporter.$DOMAIN")

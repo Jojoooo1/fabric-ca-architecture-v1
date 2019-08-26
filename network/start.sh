@@ -7,6 +7,11 @@ set -e
 
 DIR=$PWD
 
+if [ "${#ORGANIZATION_NAME[@]}" != "${#ORGANIZATION_MSPID[@]}" ] || [ "${#ORGANIZATION_NAME[@]}" != "${#ORGANIZATION_PEER_NUMBER[@]}" ] || [ "${#ORGANIZATION_NAME[@]}" != "${#ORGANIZATION_NAME[@]}" ]; then
+  echo "Build failed, Please verify your variable"
+  exit 1
+fi
+
 # Loads CA private key
 loadCAPrivateKey
 

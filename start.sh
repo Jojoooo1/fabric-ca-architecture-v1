@@ -11,7 +11,7 @@ cd $dir/certificate-authority/tls && ./build.sh
 sleep 4
 
 cd ../../network
-./identity-start.sh
+./pki-start.sh
 ./build.sh
 ./start.sh
 

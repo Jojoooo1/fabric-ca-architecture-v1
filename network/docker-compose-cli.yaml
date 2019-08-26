@@ -9,8 +9,8 @@ volumes:
 
   peer0.transporter.logistic:
   peer1.transporter.logistic:
-  # peer0.insurance.logistic:
-  # peer1.insurance.logistic:
+  peer0.insurance.logistic:
+  peer1.insurance.logistic:
 
 services:
   # SHIPPER
@@ -108,47 +108,47 @@ services:
 
   # INSURANCE
   # PEER 0
-  # couchdb.peer0.insurance:
-  #   container_name: couchdb.peer0.insurance
-  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
-  #   restart: always
-  #   environment:
-  #     - COUCHDB_USER=
-  #     - COUCHDB_PASSWORD=
-  #   ports:
-  #     - 9984:5984
-  #   networks:
-  #     - basic
-  # peer0.insurance.logistic:
-  #   container_name: peer0.insurance.logistic
-  #   extends:
-  #     file: base/docker-compose-base.yaml
-  #     service: peer0.insurance.logistic
-  #   depends_on:
-  #     - couchdb.peer0.insurance
-  #   networks:
-  #     - basic
+  couchdb.peer0.insurance:
+    container_name: couchdb.peer0.insurance
+    image: hyperledger/fabric-couchdb:$IMAGE_TAG
+    restart: always
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 9984:5984
+    networks:
+      - basic
+  peer0.insurance.logistic:
+    container_name: peer0.insurance.logistic
+    extends:
+      file: base/docker-compose-base.yaml
+      service: peer0.insurance.logistic
+    depends_on:
+      - couchdb.peer0.insurance
+    networks:
+      - basic
   # PEER 1
-  # couchdb.peer1.insurance:
-  #   container_name: couchdb.peer1.insurance
-  #   image: hyperledger/fabric-couchdb:$IMAGE_TAG
-  #   restart: always
-  #   environment:
-  #     - COUCHDB_USER=
-  #     - COUCHDB_PASSWORD=
-  #   ports:
-  #     - 1084:5984
-  #   networks:
-  #     - basic
-  # peer1.insurance.logistic:
-  #   container_name: peer1.insurance.logistic
-  #   extends:
-  #     file: base/docker-compose-base.yaml
-  #     service: peer1.insurance.logistic
-  #   depends_on:
-  #     - couchdb.peer1.transporter
-  #   networks:
-  #     - basic
+  couchdb.peer1.insurance:
+    container_name: couchdb.peer1.insurance
+    image: hyperledger/fabric-couchdb:$IMAGE_TAG
+    restart: always
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 1084:5984
+    networks:
+      - basic
+  peer1.insurance.logistic:
+    container_name: peer1.insurance.logistic
+    extends:
+      file: base/docker-compose-base.yaml
+      service: peer1.insurance.logistic
+    depends_on:
+      - couchdb.peer1.transporter
+    networks:
+      - basic
 
   cli:
     container_name: cli
@@ -188,9 +188,9 @@ services:
       - couchdb.peer1.transporter
       - peer0.transporter.logistic
       - peer1.transporter.logistic
-      # - couchdb.peer0.insurance
-      # - couchdb.peer1.insurance
-      # - peer0.insurance.logistic
-      # - peer1.insurance.logistic
+      - couchdb.peer0.insurance
+      - couchdb.peer1.insurance
+      - peer0.insurance.logistic
+      - peer1.insurance.logistic
     networks:
       - basic
