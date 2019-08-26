@@ -9,6 +9,7 @@ ORGANIZATION_USERS_transporter=(admin "Admin@transporter.$DOMAIN")
 ORGANIZATION_USERS_insurance=(admin "Admin@insurance.$DOMAIN")
 
 CA_PREFIX=''
+TLS_CA=true
 
 # Directories variables
 ROOT_CA_DIR=$PWD

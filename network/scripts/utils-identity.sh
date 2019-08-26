@@ -1,39 +1,4 @@
-#!/bin/bash
-set -e
-
-# import var
-export COMPOSE_PROJECT_NAME=net
-export IMAGE_TAG=latest
-export CA_TLS_ENABLED=true
-
-DOMAIN=logistic
-ORGANIZATION_DOMAIN="logistic"
-# ORGANIZATION_NAME=("shipper")
-ORGANIZATION_NAME=("shipper" "transporter" "insurance")
-ORGANIZATION_TYPE=("peer" "peer" "peer")
-ORGANIZATION_PEER_NUMBER=(2 2 2)
-
-ORGANIZATION_CA_URL=("localhost:7054" "localhost:8054" "localhost:9054")
-# Defined organization identity here individually
-# CA admin is assigned by default to "admin"
-# Admin@ORG_FULL_NAME is assigned by default to msp/admincerts
-ORGANIZATION_USERS_shipper=("Admin@shipper.logistic")
-ORGANIZATION_USERS_transporter=("Admin@transporter.logistic")
-ORGANIZATION_USERS_insurance=("Admin@insurance.logistic")
-
-# Folders
-CONFIG_FOLDER=$PWD/crypto-config
-
-if [ ! "$(ls -A $CONFIG_FOLDER)" ]; then
-  echo "Build failed, Please build crypto-config folder first"
-  exit 1
-fi
-
-docker-compose -f docker-compose-ca.yaml up -d
-
-sleep 25 # need to wait tls backdated certificate # Failed to verify certificate: x509: certificate has expired or is not yet valid
-
-# Enroll boostrapped user
+# Enroll boostrapped CA user # default named admin
 enrollBoostrappedAdmin() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
@@ -41,7 +6,7 @@ enrollBoostrappedAdmin() {
     echo "Enrolling bootstrapped admin for $ORG_NAME..."
 
     ORG_FULL_NAME=$ORG_NAME.$ORGANIZATION_DOMAIN
-    ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
+    ORG_DIR=$PWD/crypto-config/peerOrganizations/$ORG_FULL_NAME
     # boostrapped admin folder
     REGISTRAR_DIR=$ORG_DIR/users/admin
     # Sets identity as CA admin
@@ -70,8 +35,8 @@ registerIdentity() {
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo "Registering organization identity for $ORG_NAME..."
 
-    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
-    ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
+    ORG_FULL_NAME=$ORG_NAME.$ORGANIZATION_DOMAIN
+    ORG_DIR=$PWD/crypto-config/peerOrganizations/$ORG_FULL_NAME
     # boostrapped admin folder
     REGISTRAR_DIR=$ORG_DIR/users/admin
 
@@ -103,8 +68,8 @@ enrollIdentity() {
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo "Enrolling organization identity for $ORG_NAME..."
 
-    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
-    ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
+    ORG_FULL_NAME=$ORG_NAME.$ORGANIZATION_DOMAIN
+    ORG_DIR=$PWD/crypto-config/peerOrganizations/$ORG_FULL_NAME
 
     # Sets TLS certificate to communicate with fabric-ca
     export FABRIC_CA_CLIENT_TLS_CERTFILES=$ORG_DIR/tlsca/tls-chain.$ORG_FULL_NAME-cert.pem
@@ -136,14 +101,14 @@ enrollIdentity() {
   echo "******************************"
 }
 
-copyAdminIdentityToAllMSPIdentity() {
+copyAdminIdentityToMspFolder() {
   echo "******************************"
   for i in ${!ORGANIZATION_NAME[@]}; do
     ORG_NAME=${ORGANIZATION_NAME[$i]}
     echo "Copying admin certificate to MSP folder for $ORG_NAME..."
 
-    ORG_FULL_NAME=$ORG_NAME.$DOMAIN
-    ORG_DIR=$PWD/crypto-config/${ORGANIZATION_TYPE}Organizations/$ORG_FULL_NAME
+    ORG_FULL_NAME=$ORG_NAME.$ORGANIZATION_DOMAIN
+    ORG_DIR=$PWD/crypto-config/peerOrganizations/$ORG_FULL_NAME
 
     # Copy admin signed cert in admincerts folder
     ADMIN_DIR=$ORG_DIR/users/Admin@$ORG_FULL_NAME
@@ -170,11 +135,3 @@ copyAdminIdentityToAllMSPIdentity() {
   done
   echo "******************************"
 }
-
-enrollBoostrappedAdmin
-
-sleep 30 # need to wait identity backdated certificate # Failed to verify certificate: x509: certificate has expired or is not yet valid
-
-registerIdentity
-enrollIdentity
-copyAdminIdentityToAllMSPIdentity

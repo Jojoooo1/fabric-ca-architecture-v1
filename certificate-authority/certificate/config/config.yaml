@@ -1,8 +1,8 @@
 NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: intermediatecacerts/ORG_ICA_CERT_NAME
+    Certificate: intermediatecerts/ORG_ICA_CERT_NAME
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: intermediatecacerts/ORG_ICA_CERT_NAME
+    Certificate: intermediatecerts/ORG_ICA_CERT_NAME
     OrganizationalUnitIdentifier: peer

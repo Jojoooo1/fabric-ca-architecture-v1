@@ -2,12 +2,12 @@
 set -e
 
 # import variable
-. ./env.sh
+. ./config/env.sh
 
 ROOT_CA_DIR=$PWD
-FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
+FABRIC_CA_DIR=$PWD/../../network # Fabric CA is created as intermediate CA
 
-# Remove ROOT_CA_CONFIG
+# Remove ROOT_CA_CONFIG
 rm -rf root-ca/*
 rm -rf intermediate-ca/*
 
@@ -15,7 +15,7 @@ rm -rf ./openssl_*
 
 echo "ROOT & INTERMEDIATE TLS certificates were removed successfully"
 
-# Remove FABRIC_CA_TLS
+# Remove FABRIC_CA_TLS
 cd $FABRIC_CA_DIR
 
 for i in ${!ORGANIZATION_NAME[@]}; do
@@ -29,7 +29,7 @@ for i in ${!ORGANIZATION_NAME[@]}; do
   rm -rf $ORG_FABRIC_DIR/tlsca/*
 
   # Remove TLS for PEERS
-  for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
+  for ((j = 0; j < ${ORGANIZATION_PEER_NUMBER[$i]}; j++)); do # loop every peer
     IDENTITY_NAME="peer$j.$ORG_FULL_NAME"
     rm -rf $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/msp/tlscacerts/*
     rm -rf $ORG_FABRIC_DIR/peers/$IDENTITY_NAME/msp/tlsintermediatecerts/*

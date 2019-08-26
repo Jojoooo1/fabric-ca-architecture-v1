@@ -2,7 +2,7 @@
 set -e
 
 # import variable
-. ./env.sh
+. ./config/env.sh
 
 # Remove ROOT_CA_CONFIG
 rm -rf root-ca/*

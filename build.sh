@@ -13,6 +13,5 @@ sleep 4
 cd ../../network
 ./identity-start.sh
 ./build.sh
-./start.sh
 
 cd $dir

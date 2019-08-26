@@ -1,0 +1,58 @@
+#
+# Copyright IBM Corp All Rights Reserved
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+version: "2"
+
+networks:
+  basic:
+
+services:
+  ica.shipper.logistic:
+    container_name: ica.shipper.logistic
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      # **CONFIG** because of **BACKDATE** Sets in fabric-ca-server-config.yaml
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
+    volumes:
+      - ./crypto-config/peerOrganizations/shipper.logistic/ca/:/etc/hyperledger/fabric-ca-server-config # Copy MSP and call it from ENVIRONMENT
+      - ./crypto-config/peerOrganizations/shipper.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config-tls # Copy MSP and call it from ENVIRONMENT
+      - ./ca-config/fabric-ca-server-shipper:/etc/hyperledger/fabric-ca-server # Copy fabric-ca-server-config in fabric-ca-server
+    networks:
+      - basic
+
+  ica.transporter.logistic:
+    container_name: ica.transporter.logistic
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      # **CONFIG** because of **BACKDATE** Sets in fabric-ca-server-config.yaml
+    ports:
+      - "8054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
+    volumes:
+      - ./crypto-config/peerOrganizations/transporter.logistic/ca/:/etc/hyperledger/fabric-ca-server-config # Copy MSP and call it from ENVIRONMENT
+      - ./crypto-config/peerOrganizations/transporter.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config-tls # Copy MSP and call it from ENVIRONMENT
+      - ./ca-config/fabric-ca-server-transporter:/etc/hyperledger/fabric-ca-server # Copy fabric-ca-server-config in fabric-ca-server
+    networks:
+      - basic
+
+  ica.insurance.logistic:
+    container_name: ica.insurance.logistic
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      # **CONFIG** because of **BACKDATE** Sets in fabric-ca-server-config.yaml
+    ports:
+      - "9054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
+    volumes:
+      - ./crypto-config/peerOrganizations/insurance.logistic/ca/:/etc/hyperledger/fabric-ca-server-config # Copy MSP and call it from ENVIRONMENT
+      - ./crypto-config/peerOrganizations/insurance.logistic/tlsca/:/etc/hyperledger/fabric-ca-server-config-tls # Copy MSP and call it from ENVIRONMENT
+      - ./ca-config/fabric-ca-server-insurance:/etc/hyperledger/fabric-ca-server # Copy fabric-ca-server-config in fabric-ca-server
+    networks:
+      - basic
